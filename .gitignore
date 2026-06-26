@@ -1,0 +1,11 @@
+node_modules/
+mock-drive/
+.env
+.env.*
+!.env.example
+apps-script-*response*.html
+*-check.png
+.edge-profile*/
+dist/
+coverage/
+npm-debug.log*

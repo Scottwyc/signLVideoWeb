@@ -1,0 +1,17 @@
+{
+  "name": "global-video-upload-portal",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Bilingual video upload portal with Google Drive backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "google-auth-library": "^10.9.0",
+    "google-drive-uploader": "^0.2.3",
+    "multer": "^1.4.5-lts.1"
+  }
+}

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>视频上传平台 | Video Upload Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script defer src="config.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <i data-lucide="graduation-cap"></i>
+        </div>
+        <div class="brand-title" data-i18n="brandTitle">视频上传平台</div>
+      </div>
+      <button class="lang-switch" id="langSwitch" type="button" aria-label="Switch language">
+        <i data-lucide="languages"></i>
+        <span id="langSwitchLabel">EN</span>
+      </button>
+    </header>
+
+    <main class="layout">
+      <section class="hero" aria-label="Video upload portal">
+        <div class="hero-copy">
+          <h1 data-i18n="headline">上传视频</h1>
+        </div>
+        <div class="hero-pills" aria-label="Highlights">
+          <span><i data-lucide="globe"></i><b data-i18n="pillGlobal">全球访问</b></span>
+          <span><i data-lucide="file-video"></i><b data-i18n="pillVideo">多个视频</b></span>
+          <span><i data-lucide="cloud-upload"></i><b data-i18n="pillDrive">获取上传链接</b></span>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <form class="upload-panel" id="submissionForm">
+          <div class="panel-head">
+            <div>
+              <h2 data-i18n="formTitle">信息登记</h2>
+              <p data-i18n="formSubtitle">提交信息后，页面将生成对应的 Google Drive 上传链接。</p>
+            </div>
+            <div class="status-chip" id="modeChip">
+              <i data-lucide="link"></i>
+              <span data-i18n="chipLabel">Drive 链接上传</span>
+            </div>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span class="required-label" data-i18n="nameLabel">姓名</span>
+              <input name="name" type="text" required autocomplete="name" data-i18n-placeholder="namePlaceholder" placeholder="请输入姓名">
+            </label>
+            <label>
+              <span class="required-label" data-i18n="orgLabel">机构 / 组织</span>
+              <input name="organization" type="text" required autocomplete="organization" data-i18n-placeholder="orgPlaceholder" placeholder="学校、大学、机构或组织">
+            </label>
+            <label>
+              <span class="required-label" data-i18n="emailLabel">邮箱</span>
+              <input name="email" type="email" required autocomplete="email" data-i18n-placeholder="emailPlaceholder" placeholder="name@example.com">
+            </label>
+            <label>
+              <span class="required-label" data-i18n="countryLabel">国家 / 地区</span>
+              <input name="countries" type="text" list="countryOptions" required autocomplete="country-name" data-i18n-placeholder="countryPlaceholder" placeholder="输入国家或地区，支持搜索">
+            </label>
+          </div>
+
+          <datalist id="countryOptions">
+            <option value="Argentina"></option>
+            <option value="Australia"></option>
+            <option value="Austria"></option>
+            <option value="Bangladesh"></option>
+            <option value="Belgium"></option>
+            <option value="Brazil"></option>
+            <option value="Canada"></option>
+            <option value="Chile"></option>
+            <option value="China"></option>
+            <option value="Czech Republic"></option>
+            <option value="Denmark"></option>
+            <option value="Egypt"></option>
+            <option value="Finland"></option>
+            <option value="France"></option>
+            <option value="Germany"></option>
+            <option value="Greece"></option>
+            <option value="Hong Kong"></option>
+            <option value="India"></option>
+            <option value="Indonesia"></option>
+            <option value="Ireland"></option>
+            <option value="Italy"></option>
+            <option value="Japan"></option>
+            <option value="Kenya"></option>
+            <option value="Malaysia"></option>
+            <option value="Mexico"></option>
+            <option value="Netherlands"></option>
+            <option value="New Zealand"></option>
+            <option value="Nigeria"></option>
+            <option value="Norway"></option>
+            <option value="Pakistan"></option>
+            <option value="Philippines"></option>
+            <option value="Poland"></option>
+            <option value="Portugal"></option>
+            <option value="Qatar"></option>
+            <option value="Russia"></option>
+            <option value="Saudi Arabia"></option>
+            <option value="Singapore"></option>
+            <option value="South Africa"></option>
+            <option value="South Korea"></option>
+            <option value="Spain"></option>
+            <option value="Sweden"></option>
+            <option value="Switzerland"></option>
+            <option value="Taiwan"></option>
+            <option value="Thailand"></option>
+            <option value="Turkey"></option>
+            <option value="United Arab Emirates"></option>
+            <option value="United Kingdom"></option>
+            <option value="United States"></option>
+            <option value="Vietnam"></option>
+          </datalist>
+
+          <label class="full-width">
+            <span data-i18n="othersLabel">其他说明</span>
+            <textarea name="others" rows="4" data-i18n-placeholder="othersPlaceholder" placeholder="可填写补充说明、链接或其他信息"></textarea>
+          </label>
+
+          <div class="link-preview" id="linkPreview" hidden>
+            <div class="link-preview-head">
+              <div class="upload-icon">
+                <i data-lucide="folder-up"></i>
+              </div>
+              <div>
+                <strong data-i18n="linkReadyTitle">上传链接已生成</strong>
+                <p data-i18n="linkReadyHint">请打开 Google Drive 文件夹上传一个或多个视频。</p>
+              </div>
+            </div>
+            <div class="submission-id">
+              <span data-i18n="submissionIdLabel">提交编号</span>
+              <b id="submissionId">-</b>
+            </div>
+            <div class="link-actions">
+              <a class="primary-link" id="driveLink" href="#" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                <span id="driveLinkLabel" data-i18n="openDriveBtn">打开上传链接</span>
+              </a>
+              <button class="secondary-btn" id="confirmCompleteBtn" type="button" disabled>
+                <i data-lucide="check-circle-2"></i>
+                <span data-i18n="confirmCompleteBtn">我已完成上传</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="progress-area">
+            <div class="progress-meta">
+              <span id="progressLabel" data-i18n="progressIdle">等待提交</span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" type="submit" id="submitBtn">
+              <i data-lucide="send"></i>
+              <span class="spinner" id="submitSpinner" aria-hidden="true"></span>
+              <span id="submitBtnLabel" data-i18n="submitBtn">提交信息并获取上传链接</span>
+            </button>
+          </div>
+        </form>
+
+        <aside class="info-panel">
+          <div class="info-block">
+            <h3 data-i18n="infoTitle">提交步骤</h3>
+            <ol>
+              <li data-i18n="step1">填写必要信息并提交。</li>
+              <li data-i18n="step2">打开系统生成的 Google Drive 上传链接。</li>
+              <li data-i18n="step3">上传视频后返回页面确认完成。</li>
+            </ol>
+          </div>
+
+          <div class="result-box" id="resultBox" hidden>
+            <h3 data-i18n="resultTitle">提示</h3>
+            <p id="resultMessage"></p>
+            <a id="resultLink" href="#" target="_blank" rel="noreferrer"></a>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <iframe class="bridge-frame" id="appsScriptFrame" name="appsScriptFrame" title="Submission bridge"></iframe>
+</body>
+</html>
