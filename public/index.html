@@ -142,11 +142,19 @@
               <span data-i18n="submissionIdLabel">提交编号</span>
               <b id="submissionId">-</b>
             </div>
+            <div class="mobile-upload-note">
+              <i data-lucide="smartphone"></i>
+              <p data-i18n="mobileUploadHint">手机端请使用 Google Drive App 打开链接，登录后点击 + / 上传。如果看不到上传按钮，请复制链接后在浏览器或 Drive App 中打开。</p>
+            </div>
             <div class="link-actions">
               <a class="primary-link" id="driveLink" href="#" target="_blank" rel="noreferrer">
                 <i data-lucide="external-link"></i>
                 <span id="driveLinkLabel" data-i18n="openDriveBtn">打开上传链接</span>
               </a>
+              <button class="ghost-btn" id="copyLinkBtn" type="button">
+                <i data-lucide="copy"></i>
+                <span data-i18n="copyUploadLinkBtn">复制链接</span>
+              </button>
               <button class="secondary-btn" id="confirmCompleteBtn" type="button" disabled>
                 <i data-lucide="check-circle-2"></i>
                 <span data-i18n="confirmCompleteBtn">我已完成上传</span>

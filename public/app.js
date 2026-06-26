@@ -41,6 +41,7 @@ const translations = {
     linkReadyHint: '请打开 Google Drive 文件夹上传一个或多个视频。',
     submissionIdLabel: '提交编号',
     openDriveBtn: '打开上传链接',
+    copyUploadLinkBtn: '复制链接',
     confirmCompleteBtn: '我已完成上传',
     continueUploadBtn: '继续上传',
     exitBtn: '退出',
@@ -49,7 +50,10 @@ const translations = {
     confirmFailed: '确认失败，请稍后重试。',
     viewUploadFolder: '打开上传文件夹',
     openFirstHint: '请先打开上传链接并完成视频上传，然后再确认完成。',
-    closeHint: '可以关闭此页面。'
+    closeHint: '可以关闭此页面。',
+    mobileUploadHint: '手机端请使用 Google Drive App 打开链接，登录后点击 + / 上传。如果看不到上传按钮，请复制链接后在浏览器或 Drive App 中打开。',
+    copiedUploadLink: '上传链接已复制。请在手机浏览器或 Google Drive App 中打开并上传视频。',
+    copyFailed: '复制失败，请长按上传链接复制。'
   },
   en: {
     brandTitle: 'Video Upload Portal',
@@ -93,6 +97,7 @@ const translations = {
     linkReadyHint: 'Open the Google Drive folder and upload one or more videos.',
     submissionIdLabel: 'Submission ID',
     openDriveBtn: 'Open upload link',
+    copyUploadLinkBtn: 'Copy link',
     confirmCompleteBtn: 'I have finished uploading',
     continueUploadBtn: 'Continue uploading',
     exitBtn: 'Exit',
@@ -101,7 +106,10 @@ const translations = {
     confirmFailed: 'Confirmation failed. Please try again later.',
     viewUploadFolder: 'Open upload folder',
     openFirstHint: 'Open the upload link and upload videos before confirming completion.',
-    closeHint: 'You may close this page.'
+    closeHint: 'You may close this page.',
+    mobileUploadHint: 'On mobile, open the link with the Google Drive app, sign in, then tap + / Upload. If no upload button appears, copy the link and open it in a browser or the Drive app.',
+    copiedUploadLink: 'Upload link copied. Open it in your mobile browser or Google Drive app, then upload videos.',
+    copyFailed: 'Copy failed. Long-press the upload link to copy it.'
   }
 };
 
@@ -135,6 +143,7 @@ const els = {
   submissionId: document.getElementById('submissionId'),
   driveLink: document.getElementById('driveLink'),
   driveLinkLabel: document.getElementById('driveLinkLabel'),
+  copyLinkBtn: document.getElementById('copyLinkBtn'),
   confirmCompleteBtn: document.getElementById('confirmCompleteBtn')
 };
 
@@ -452,6 +461,21 @@ function handleDriveLinkClick() {
   showResult(t('openFirstHint'), '', '', 'success');
 }
 
+async function handleCopyLink() {
+  if (!state.latestSubmission?.folderUrl) return;
+
+  try {
+    await navigator.clipboard.writeText(state.latestSubmission.folderUrl);
+    state.latestSubmission.driveOpened = true;
+    state.latestSubmission.uploadConfirmed = false;
+    saveSubmission();
+    renderSubmissionControls();
+    showResult(t('copiedUploadLink'), '', '', 'success');
+  } catch (error) {
+    showResult(t('copyFailed'));
+  }
+}
+
 function handleExit() {
   clearStoredSubmission();
   window.open('', '_self');
@@ -465,6 +489,7 @@ els.langSwitch.addEventListener('click', toggleLanguage);
 els.form.addEventListener('submit', handleSubmit);
 els.confirmCompleteBtn.addEventListener('click', handleConfirmComplete);
 els.driveLink.addEventListener('click', handleDriveLinkClick);
+els.copyLinkBtn.addEventListener('click', handleCopyLink);
 
 state.latestSubmission = loadStoredSubmission();
 renderLanguage();
