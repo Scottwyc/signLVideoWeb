@@ -2,65 +2,241 @@
 
 更新时间：2026-06-26
 
-本文说明当前项目中“提交信息后生成 Google Drive 上传链接”的实现方式、配置步骤，以及如何自动把 Google Sheet 中的用户信息写入对应 Drive 文件夹和视频文件，方便后续查看与管理。
+本文记录当前“视频上传平台”的最简可运行方案，包括网页前端、Google Apps Script、Google Sheet、Google Drive、GitHub Pages 自动部署等已经成功配置的信息和操作流程。
 
-## 一、已实现的页面流程
+## 一、当前已跑通的整体架构
 
-当前网页流程已经从“网页直接上传视频”调整为：
+当前方案不是网页直接接收视频文件，而是：
 
 ```text
-用户填写姓名、机构、邮箱、国家/地区、其他说明
--> 点击“提交信息并获取上传链接”
--> 网页提交信息到 Google Apps Script
--> Apps Script 写入 Google Sheet
--> Apps Script 创建一个用户专属 Google Drive 子文件夹
--> 网页显示提交编号和 Drive 上传链接
--> 用户打开链接上传一个或多个视频
+GitHub Pages 静态前端
+-> Google Apps Script Web App
+-> Google Sheet 保存提交信息
+-> Google Drive 为每次提交创建专属上传文件夹
+-> 用户在 Google Drive 文件夹中上传视频
 -> 用户回到网页点击“我已完成上传”
--> Apps Script 更新 Google Sheet 状态
--> Apps Script 给 Drive 文件夹和文件写入提交信息
+-> Apps Script 更新 Sheet 状态并标注 Drive 文件
 ```
 
-## 二、相关文件
+这个方案的优点是部署简单、成本低、不需要维护 Node 服务器，也不需要把 Google 私钥放到前端。
 
-前端文件：
+## 二、当前成功配置的信息
+
+### 1. GitHub 仓库
 
 ```text
-public/index.html
-public/app.js
+https://github.com/Scottwyc/signLVideoWeb
+```
+
+当前分支：
+
+```text
+main      源码、文档、Apps Script、前端文件
+gh-pages  GitHub Actions 自动生成的网页发布分支
+```
+
+注意：`gh-pages` 是发布分支，不需要合并回 `main`。后续只需要修改 `main`，push 后 GitHub Actions 会自动更新 `gh-pages`。
+
+### 2. GitHub Pages 网页地址
+
+```text
+https://scottwyc.github.io/signLVideoWeb/
+```
+
+GitHub Pages 设置方式：
+
+```text
+Settings -> Pages
+Source: Deploy from a branch
+Branch: gh-pages
+Folder: / root
+```
+
+### 3. Google Sheet
+
+用于保存用户提交信息的 Google Sheet ID：
+
+```text
+1UcsBA46ws9DZX7_Q7TtgC99zEkwowQR9O2iOaBShPvo
+```
+
+对应链接：
+
+```text
+https://docs.google.com/spreadsheets/d/1UcsBA46ws9DZX7_Q7TtgC99zEkwowQR9O2iOaBShPvo/edit
+```
+
+实际数据写入到工作表标签：
+
+```text
+Submissions
+```
+
+### 4. Google Drive 总文件夹
+
+用于创建每个用户专属上传文件夹的根目录 ID：
+
+```text
+1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43
+```
+
+对应链接：
+
+```text
+https://drive.google.com/drive/folders/1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43
+```
+
+### 5. Google Apps Script Web App
+
+当前前端正在使用的 Apps Script Web App URL：
+
+```text
+https://script.google.com/macros/s/AKfycbxiz_N_y3gXPnbi2l98tdNQZioee4eNLC0_LSSivlHUT93Y0O2tQTk4ZVFSNcIqeAoN/exec
+```
+
+这个地址已经写入：
+
+```text
 public/config.js
-public/styles.css
 ```
 
-Apps Script 后端脚本：
+## 三、当前项目文件结构
 
 ```text
-apps-script/Code.gs
+public/
+  index.html       前端页面
+  styles.css       页面样式
+  app.js           前端交互逻辑
+  config.js        Apps Script Web App URL 配置
+  assets/          背景图片等静态资源
+
+apps-script/
+  Code.gs          Google Apps Script 后端脚本
+
+docs/
+  *.md             中文 Markdown 文档
+  *.docx           对应 Word 文档
+
+.github/workflows/
+  deploy-pages.yml GitHub Pages 自动部署 workflow
 ```
 
-## 三、为什么使用隐藏 iframe 提交
+## 四、当前网页用户流程
 
-前端没有直接使用 `fetch` 请求 Apps Script，因为 Google Apps Script Web App 在跨域 POST 时容易遇到 CORS 或重定向问题。
-
-当前采用：
+用户访问：
 
 ```text
-前端创建隐藏 form
--> target 到隐藏 iframe
--> POST 到 Apps Script Web App
--> Apps Script 返回一段 HTML
--> HTML 用 window.parent.postMessage 和 window.top.postMessage 把结果传回页面
+https://scottwyc.github.io/signLVideoWeb/
 ```
 
-Apps Script 的 HtmlService 会再包一层 Google sandbox iframe，因此脚本需要向 `window.top` 发送消息，前端页面才能稳定收到 `submissionId` 和 `folderUrl`。
+页面流程：
 
-前端现在把 `action`、`requestId`、`name`、`organization`、`email` 等字段作为普通表单字段提交，Apps Script 同时兼容普通字段和 `payload` JSON 字段，避免不同环境下 JSON 字符串解码不一致导致无法写入 Sheet。
+```text
+1. 用户填写姓名、机构/组织、邮箱、国家/地区、其他说明。
+2. 点击“提交信息并获取上传链接”。
+3. 页面显示加载动画。
+4. Apps Script 写入 Google Sheet，并在 Google Drive 中创建专属上传文件夹。
+5. 前端显示 Submission ID 和“打开上传链接”按钮。
+6. “我已完成上传”按钮默认灰色且不可点击。
+7. 用户点击“打开上传链接”后进入 Google Drive 文件夹上传视频。
+8. 点击过上传链接后，“我已完成上传”按钮变为可点击。
+9. 用户上传视频后回到网页，点击“我已完成上传”。
+10. Apps Script 更新 Google Sheet 状态，并扫描/标注 Drive 文件。
+11. “我已完成上传”再次变为灰色不可点击。
+12. 上传链接按钮变为“继续上传”，继续打开同一个 Drive 文件夹。
+```
 
-## 四、Google Sheet 准备
+## 五、前端交互细节
 
-创建一个 Google Sheet，用来保存表单记录。Apps Script 会自动使用或创建名为 `Submissions` 的工作表，并写入表头。
+### 1. 必填项
 
-当前表头包括：
+以下字段必填，页面会用红色 `*` 标识，并在缺失时阻止提交：
+
+```text
+姓名 / Name
+机构或组织 / Organization
+邮箱 / Email
+国家或地区 / Countries
+```
+
+### 2. 提交按钮
+
+初始状态：
+
+```text
+Submit details and get upload link
+```
+
+提交中：
+
+```text
+按钮显示转圈动画
+按钮文字显示正在提交
+```
+
+提交成功后：
+
+```text
+按钮变为 Exit / 退出
+```
+
+### 3. 上传链接按钮
+
+第一次提交成功后显示：
+
+```text
+Open upload link
+```
+
+用户点击“我已完成上传”后，该按钮变为：
+
+```text
+Continue uploading
+```
+
+两个状态打开的都是同一个 Google Drive 子文件夹，不会新建提交记录。
+
+### 4. “I have finished uploading” 按钮
+
+默认状态：
+
+```text
+灰色，不可点击
+```
+
+点击过 `Open upload link` 或 `Continue uploading` 后：
+
+```text
+变为正常颜色，可点击
+```
+
+点击确认完成并成功更新 Sheet 后：
+
+```text
+再次变为灰色，不可点击
+```
+
+### 5. Message 提示
+
+成功提示已经简化为：
+
+```text
+Information submitted. Upload now.
+```
+
+中文为：
+
+```text
+信息已提交，请现在上传。
+```
+
+提示区不再额外显示 `Open upload folder` 链接，避免和主上传按钮重复。
+
+错误提示会用红色显示，例如网络异常、配置缺失、必填项缺失等。
+
+## 六、Google Sheet 表结构
+
+`Submissions` 工作表当前字段：
 
 ```text
 submission_id
@@ -81,137 +257,38 @@ notes
 user_agent
 ```
 
-如果 Sheet 里已经有旧表头，脚本会自动补充缺失的新列。
-
-需要复制 Google Sheet 链接中的 ID。
-
-示例：
+重要字段说明：
 
 ```text
-https://docs.google.com/spreadsheets/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/edit
+submission_id       每次提交的唯一编号
+submitted_at        用户提交信息的时间
+folder_id           本次提交对应的 Drive 子文件夹 ID
+folder_url          用户上传视频的 Drive 文件夹链接
+status              当前状态
+completed_at        用户点击“我已完成上传”的时间
+file_count          该文件夹下扫描到的文件数量
+upload_file_names   上传文件名列表
+annotated_at        文件夹/文件标注时间
 ```
 
-其中 `1AbCdEfGhIjKlMnOpQrStUvWxYz` 就是 `SPREADSHEET_ID`。
-
-## 五、Google Drive 总文件夹准备
-
-创建一个用于接收所有视频的 Google Drive 总文件夹。
-
-示例结构：
+当前状态值：
 
 ```text
-Video Upload Root
-├── VID-20260626-213000-ABCDEF12_张三_北京师范大学
-├── VID-20260626-213120-39F2A001_Li-Ming_University-A
+pending_upload      已提交信息，等待用户上传
+user_confirmed      用户已点击“我已完成上传”
 ```
 
-需要复制总文件夹链接中的 ID。
+## 七、Google Drive 文件夹和文件标注逻辑
 
-示例：
+Apps Script 会自动给每次提交创建一个 Drive 子文件夹，名称类似：
 
 ```text
-https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYz
+VID-20260626-213000-ABCDEF12_张三_北京师范大学
 ```
 
-其中 `1AbCdEfGhIjKlMnOpQrStUvWxYz` 就是 `ROOT_FOLDER_ID`。
+### 1. 创建提交记录时
 
-## 六、Apps Script 配置步骤
-
-1. 打开 Google Apps Script：
-
-```text
-https://script.google.com/
-```
-
-2. 新建项目。
-3. 把项目中的 `apps-script/Code.gs` 内容复制到 Apps Script 编辑器。
-4. 修改文件顶部：
-
-```javascript
-const SPREADSHEET_ID = 'PASTE_GOOGLE_SHEET_ID_HERE';
-const ROOT_FOLDER_ID = 'PASTE_DRIVE_ROOT_FOLDER_ID_HERE';
-```
-
-改成真实 Google Sheet ID 和 Drive 总文件夹 ID。
-
-5. 按需设置是否自动重命名文件：
-
-```javascript
-const RENAME_UPLOADED_FILES = true;
-```
-
-`true` 表示用户点击“我已完成上传”后，脚本会给文件名前缀加上 Submission ID，例如：
-
-```text
-VID-20260626-213000-ABCDEF12_01_original-video.mp4
-```
-
-如果不想改用户上传的原始文件名，可以改为：
-
-```javascript
-const RENAME_UPLOADED_FILES = false;
-```
-
-6. 运行一次 `setupSheet`。
-
-首次运行时，Google 会要求授权访问 Google Sheet 和 Google Drive。
-
-7. 部署为 Web App：
-
-```text
-Deploy -> New deployment -> Web app
-```
-
-建议设置：
-
-```text
-Execute as: Me
-Who has access: Anyone
-```
-
-8. 部署后复制 Web App URL，格式类似：
-
-```text
-https://script.google.com/macros/s/AKfycbx.../exec
-```
-
-如果修改了 `Code.gs`，需要重新部署 Web App：
-
-```text
-Deploy -> Manage deployments -> Edit -> Version 选择 New version -> Deploy
-```
-
-只在编辑器里保存代码，不一定会更新已经发布的 `/exec` 地址对应版本。
-
-## 七、前端配置步骤
-
-打开：
-
-```text
-public/config.js
-```
-
-把：
-
-```javascript
-appsScriptUrl: ''
-```
-
-改为：
-
-```javascript
-appsScriptUrl: 'https://script.google.com/macros/s/AKfycbx.../exec'
-```
-
-保存后刷新网页。
-
-## 八、自动写入 Drive 文件夹和视频文件信息
-
-现在脚本会自动把 Google Sheet 里的信息写入 Drive 文件夹和视频文件。
-
-### 创建提交记录时
-
-Apps Script 会创建用户专属文件夹，并把以下信息写入文件夹描述：
+脚本会给 Drive 子文件夹写入描述信息，包括：
 
 ```text
 Submission ID
@@ -224,89 +301,170 @@ Folder URL
 Other notes
 ```
 
-这样管理员在 Google Drive 中查看该文件夹详情时，就能看到对应用户信息。
+### 2. 用户点击“我已完成上传”时
 
-### 用户点击“我已完成上传”时
-
-Apps Script 会执行以下动作：
-
-1. 读取该提交编号对应的 Sheet 行。
-2. 找到该行记录的 Drive 子文件夹。
-3. 扫描子文件夹中的文件。
-4. 给每个文件写入同样的描述信息。
-5. 可选：给文件名前缀加上 Submission ID 和序号。
-6. 把文件数量写入 Sheet 的 `file_count`。
-7. 把文件名列表写入 Sheet 的 `upload_file_names`。
-8. 把标注时间写入 Sheet 的 `annotated_at`。
-9. 把状态更新为 `user_confirmed`。
-
-文件描述示例：
+脚本会：
 
 ```text
-Submission ID: VID-20260626-213000-ABCDEF12
-Name: 张三
-Organization: 北京师范大学
-Email: zhangsan@example.com
-Countries: China
-Submitted at: Fri Jun 26 2026 ...
-Folder URL: https://drive.google.com/drive/folders/...
-Other notes: ...
-
-File original name: lecture-video.mp4
+1. 根据 submission_id 找到 Sheet 中对应行。
+2. 找到该行对应的 Drive 子文件夹。
+3. 扫描该文件夹中的文件。
+4. 给每个文件写入描述信息。
+5. 统计文件数量并写回 file_count。
+6. 把文件名列表写回 upload_file_names。
+7. 把标注时间写回 annotated_at。
+8. 把状态更新为 user_confirmed。
 ```
 
-## 九、权限说明
+默认会自动重命名上传文件，给文件名前缀加上提交编号和序号：
 
-Apps Script 会为每次提交创建一个 Drive 子文件夹，并执行：
+```text
+VID-20260626-213000-ABCDEF12_01_original-video.mp4
+```
+
+如果不希望自动重命名，可以在 `apps-script/Code.gs` 顶部修改：
 
 ```javascript
-folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
+const RENAME_UPLOADED_FILES = false;
 ```
 
-含义是：
+## 八、Apps Script 关键配置
+
+当前 `apps-script/Code.gs` 顶部配置：
+
+```javascript
+const SPREADSHEET_ID = '1UcsBA46ws9DZX7_Q7TtgC99zEkwowQR9O2iOaBShPvo';
+const ROOT_FOLDER_ID = '1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43';
+const SHEET_NAME = 'Submissions';
+const BRIDGE_SOURCE = 'video-upload-portal-apps-script';
+const RENAME_UPLOADED_FILES = true;
+```
+
+### 重新部署 Apps Script 的注意事项
+
+如果修改了 `Code.gs`，只保存代码还不够，需要部署新版本：
 
 ```text
-知道该子文件夹链接的人可以编辑/上传文件。
+Deploy -> Manage deployments -> Edit
+Version: New version
+Deploy
 ```
 
-需要注意：
+否则网页的 `/exec` 地址可能仍然运行旧版本代码。
 
-- 链接泄露后，其他人也可能上传文件。
-- 建议每个用户单独创建子文件夹，不要共用一个文件夹。
-- 后续正式使用时，可以考虑更严格的权限策略。
+## 九、为什么使用隐藏 iframe 提交
 
-## 十、测试清单
+前端没有直接使用 `fetch` 请求 Apps Script，因为 Google Apps Script Web App 在跨域 POST 时容易遇到 CORS 或重定向问题。
 
-1. 网页能正常打开。
-2. 必填项为空时不能提交。
-3. 邮箱格式错误时不能提交。
-4. 填完信息后能生成提交编号。
-5. Google Sheet 出现一条新记录。
-6. Google Drive 总文件夹下出现一个新子文件夹。
-7. Drive 子文件夹描述中能看到提交信息。
-8. 网页上的“打开上传链接”能进入该子文件夹。
-9. 用户可以在子文件夹中上传视频。
-10. 点击“我已完成上传”后，Google Sheet 的 `status` 变为 `user_confirmed`。
-11. `file_count` 能记录该文件夹下文件数量。
-12. `upload_file_names` 能记录文件名列表。
-13. `annotated_at` 能记录标注时间。
-14. Drive 文件详情中能看到用户信息描述。
-15. 如果 `RENAME_UPLOADED_FILES = true`，文件名会加上 Submission ID 前缀。
+当前采用：
 
-## 十一、当前限制
+```text
+前端创建隐藏 form
+-> target 到隐藏 iframe
+-> POST 到 Apps Script Web App
+-> Apps Script 返回 HTML
+-> HTML 使用 window.parent.postMessage 和 window.top.postMessage 把结果传回页面
+```
 
-- 网页不能直接验证 Drive 上传过程，只能通过确认按钮和文件夹扫描辅助判断。
-- 如果用户打开 Drive 后没有上传，系统也会有一条 `pending_upload` 记录。
-- 如果用户点击确认但没有上传文件，`file_count` 可能为 0。
-- Drive 子文件夹采用链接编辑权限，适合试点，但不适合高安全场景。
-- 文件标注发生在用户点击“我已完成上传”之后；如果用户不点击确认，文件不会立即被标注。
+Apps Script 的 `HtmlService` 会包一层 Google sandbox iframe，因此脚本需要向 `window.top` 发送消息，前端页面才能稳定收到：
 
-## 十二、后续可增强方向
+```text
+submissionId
+folderUrl
+```
 
-- Apps Script 定时扫描所有 pending 文件夹。
-- 自动把有文件的记录标为 `uploaded_detected`。
-- 自动给新发现的文件补写描述。
-- 自动发送确认邮件。
-- 管理员检查状态字段。
-- 增加验证码或提交频率限制。
-- 给 Drive 子文件夹设置更严格权限。
+前端现在把字段作为普通表单字段提交，而不是只提交 JSON 字符串，避免不同环境下 JSON 解码不一致导致无法写入 Sheet。
+
+## 十、GitHub Pages 自动部署
+
+当前 workflow：
+
+```text
+.github/workflows/deploy-pages.yml
+```
+
+部署逻辑：
+
+```text
+push 到 main
+-> GitHub Actions 运行
+-> 将 public/ 目录发布到 gh-pages 分支
+-> GitHub Pages 从 gh-pages / root 提供网页
+```
+
+当前使用 `peaceiris/actions-gh-pages` 发布 `public/` 目录。第一次尝试使用 GitHub 官方 Pages Actions 时，失败发生在 `Setup Pages`；后来改为发布到 `gh-pages` 分支，部署成功。
+
+## 十一、已经验证过的结果
+
+已经确认：
+
+```text
+1. GitHub 仓库已建立并推送。
+2. GitHub Actions 可以成功运行。
+3. gh-pages 分支已自动生成。
+4. GitHub Pages 网页可以访问。
+5. 前端能提交信息到 Apps Script。
+6. Apps Script 能写入 Google Sheet 的 Submissions 工作表。
+7. Apps Script 能在 Google Drive 根文件夹下创建子文件夹。
+8. 直接调用 Web App 曾成功返回 ok:true、submissionId 和 folderUrl。
+9. 网页端提交后，Sheet 中能在 Submissions 标签看到记录。
+```
+
+## 十二、当前限制
+
+当前最简方案仍然有以下限制：
+
+```text
+1. 网页本身不直接上传视频文件。
+2. 用户需要在 Google Drive 页面中上传视频。
+3. 网页无法强制验证用户是否真的上传了文件。
+4. 文件扫描和标注发生在用户点击“我已完成上传”之后。
+5. Drive 子文件夹采用“知道链接的人可编辑”，适合试点，但不是高安全方案。
+6. 如果用户不点击确认，Sheet 状态可能一直停留在 pending_upload。
+```
+
+如果以后要在网页里直接拖拽/选择本地文件并上传到 Drive，需要改成以下更复杂方案之一：
+
+```text
+方案 A：前端 Google OAuth 登录后调用 Drive API
+方案 B：恢复服务器后端上传到 Drive
+方案 C：Cloud Storage 直传，再同步到 Drive
+```
+
+## 十三、后续维护流程
+
+### 修改网页前端
+
+```text
+修改 public/
+git add .
+git commit -m "描述修改"
+git push origin main
+```
+
+GitHub Actions 会自动更新 `gh-pages`，无需手动合并分支。
+
+### 修改 Apps Script
+
+```text
+1. 修改 apps-script/Code.gs
+2. 复制到 Google Apps Script 编辑器
+3. 保存
+4. Deploy -> Manage deployments -> Edit -> New version -> Deploy
+5. 如果 Web App URL 变化，更新 public/config.js
+6. 提交并推送代码
+```
+
+### 修改文档
+
+文档规则：
+
+```text
+每份重要方案文档同时保留 .md 和 .docx
+```
+
+导出 Word 示例：
+
+```powershell
+pandoc docs\simple-drive-link-implementation.md -f markdown -t docx -o docs\simple-drive-link-implementation.docx
+```
