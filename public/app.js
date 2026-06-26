@@ -108,6 +108,7 @@ const translations = {
 const CONFIG = window.UPLOAD_PORTAL_CONFIG || {};
 const BRIDGE_SOURCE = 'video-upload-portal-apps-script';
 const REQUEST_TIMEOUT_MS = 45000;
+const SUBMISSION_STORAGE_KEY = 'videoUploadPortal.latestSubmission';
 
 const state = {
   lang: localStorage.getItem('lang') || 'zh',
@@ -165,6 +166,35 @@ function toggleLanguage() {
   state.lang = state.lang === 'zh' ? 'en' : 'zh';
   localStorage.setItem('lang', state.lang);
   renderLanguage();
+}
+
+function loadStoredSubmission() {
+  try {
+    const raw = window.localStorage.getItem(SUBMISSION_STORAGE_KEY);
+    if (!raw) return null;
+
+    const submission = JSON.parse(raw);
+    if (!submission || !submission.submissionId || !submission.folderUrl) {
+      return null;
+    }
+    return {
+      submissionId: submission.submissionId,
+      folderUrl: submission.folderUrl,
+      driveOpened: Boolean(submission.driveOpened),
+      uploadConfirmed: Boolean(submission.uploadConfirmed)
+    };
+  } catch (error) {
+    return null;
+  }
+}
+
+function saveSubmission() {
+  if (!state.latestSubmission) return;
+  window.localStorage.setItem(SUBMISSION_STORAGE_KEY, JSON.stringify(state.latestSubmission));
+}
+
+function clearStoredSubmission() {
+  window.localStorage.removeItem(SUBMISSION_STORAGE_KEY);
 }
 
 function setBusy(isBusy) {
@@ -325,6 +355,7 @@ function showSubmission(response, shouldShowMessage = true) {
   };
 
   state.latestSubmission = submission;
+  saveSubmission();
   renderSubmissionControls();
 
   if (shouldShowMessage) {
@@ -397,6 +428,7 @@ async function handleConfirmComplete() {
   try {
     await postToAppsScript(buildPayload('confirmUpload'));
     state.latestSubmission.uploadConfirmed = true;
+    saveSubmission();
     renderSubmissionControls();
     updatePrimaryAction();
     setProgress(100, t('confirmed'));
@@ -415,11 +447,13 @@ function handleDriveLinkClick() {
 
   state.latestSubmission.driveOpened = true;
   state.latestSubmission.uploadConfirmed = false;
+  saveSubmission();
   renderSubmissionControls();
   showResult(t('openFirstHint'), '', '', 'success');
 }
 
 function handleExit() {
+  clearStoredSubmission();
   window.open('', '_self');
   window.close();
   window.setTimeout(() => {
@@ -432,6 +466,7 @@ els.form.addEventListener('submit', handleSubmit);
 els.confirmCompleteBtn.addEventListener('click', handleConfirmComplete);
 els.driveLink.addEventListener('click', handleDriveLinkClick);
 
+state.latestSubmission = loadStoredSubmission();
 renderLanguage();
 setProgress(0, t('progressIdle'));
 if (window.lucide) window.lucide.createIcons();
