@@ -5,21 +5,30 @@ const translations = {
     pillGlobal: '全球访问',
     pillVideo: '多个视频',
     pillDrive: '获取上传链接',
+    pillDriveMobile: '共享到 Gmail',
     formTitle: '信息登记',
     formSubtitle: '提交信息后，页面将生成对应的 Google Drive 上传链接。',
+    formSubtitleMobile: '提交信息后，系统会把上传文件夹共享到填写的 Gmail。',
     chipLabel: 'Drive 链接上传',
+    chipLabelMobile: 'Drive App 上传',
+    mobileDeviceNote: 'NOTE: 建议使用 PC 端，操作更方便。手机端请填写 Google Drive App 当前登录的 Gmail 邮箱；提交后到 Google Drive App 的“与我共享”中找到最新共享文件夹并上传。',
     nameLabel: '姓名',
     orgLabel: '机构 / 组织',
     emailLabel: '邮箱',
-    emailHint: '手机上传请尽量填写 Google Drive App 登录的 Gmail/Google 邮箱，系统会把上传文件夹共享给此邮箱。',
+    emailHint: 'PC 端可填写常用邮箱；如果使用手机上传，请填写 Google Drive App 登录的 Gmail 邮箱。',
+    emailHintMobile: '手机上传必须填写 Google Drive App 当前登录的 Gmail 邮箱，系统会把上传文件夹共享给此 Gmail。',
     countryLabel: '国家 / 地区',
     othersLabel: '其他说明',
     progressIdle: '等待提交',
     submitBtn: '提交信息并获取上传链接',
+    submitBtnMobile: '提交信息并共享文件夹',
     infoTitle: '提交步骤',
     step1: '填写必要信息并提交。',
     step2: '打开系统生成的 Google Drive 上传链接。',
     step3: '上传视频后返回页面确认完成。',
+    step1Mobile: '填写必要信息，邮箱必须是手机 Google Drive App 登录的 Gmail。',
+    step2Mobile: '提交后打开 Google Drive App，在“与我共享”中找到最新共享文件夹。',
+    step3Mobile: '进入文件夹上传视频后，返回页面确认完成。',
     resultTitle: '提示',
     namePlaceholder: '请输入姓名',
     orgPlaceholder: '学校、大学、机构或组织',
@@ -31,15 +40,20 @@ const translations = {
     missingOrg: '机构 / 组织',
     missingEmail: '邮箱',
     invalidEmail: '有效邮箱地址',
+    invalidGmail: '手机端请填写有效的 Gmail 地址，例如 yourname@gmail.com',
     missingCountries: '国家 / 地区',
     configMissing: '尚未配置 Apps Script Web App 地址，请先在 public/config.js 中填写 appsScriptUrl。',
     submitHint: '正在提交信息...',
     success: '信息已提交，请现在上传。',
+    mobileSuccess: '信息已提交，上传文件夹已共享到你的 Gmail。请打开 Google Drive App，在“与我共享”中找到最新共享文件夹并上传。',
+    mobileSuccessNoShare: '信息已提交。请打开 Google Drive App，在“与我共享”中查找最新共享文件夹；如果暂时看不到，请稍后刷新或检查 Gmail 是否正确。',
     networkError: '提交失败或网络不通畅，请检查网络后重试。',
     serverError: '服务暂时没有响应，请稍后再试。',
     timeoutError: '提交超时，请检查网络后重试。',
     linkReadyTitle: '上传链接已生成',
     linkReadyHint: '请打开 Google Drive 文件夹上传一个或多个视频。',
+    linkReadyTitleMobile: '请到 Google Drive App 上传',
+    linkReadyHintMobile: '上传文件夹已共享到填写的 Gmail。手机端请在 Google Drive App 的“与我共享”中找到最新文件夹。',
     submissionIdLabel: '提交编号',
     openDriveBtn: '打开上传链接',
     copyUploadLinkBtn: '复制链接',
@@ -52,8 +66,12 @@ const translations = {
     viewUploadFolder: '打开上传文件夹',
     openFirstHint: '请先打开上传链接并完成视频上传，然后再确认完成。',
     closeHint: '可以关闭此页面。',
-    mobileUploadHint: '手机端建议使用填写的 Gmail/Google 邮箱登录 Google Drive App。提交后可在“与我共享”中查找文件夹，也可复制链接到 Safari、Chrome 或 Drive App 中打开。',
-    inAppBrowserHint: '如果在微信等内置浏览器中只看到“没有内容”或没有上传按钮，请点击“复制链接”，再到 Safari、Chrome 或 Google Drive App 中打开；也可在 Drive App 的“与我共享”中查找该文件夹。',
+    mobileUploadHint: '手机端不建议通过网页链接上传。请打开 Google Drive App，用填写的 Gmail 登录后，在“与我共享”中找到最新共享文件夹并上传。',
+    inAppBrowserHint: '微信等内置浏览器不适合上传 Google Drive 文件。请打开 Google Drive App，在“与我共享”中找到最新共享文件夹并上传。',
+    mobileUploadStep1: '打开 Google Drive App，并确认登录的是刚才填写的 Gmail。',
+    mobileUploadStep2: '进入“与我共享”，找到最新共享的上传文件夹。',
+    mobileUploadStep3: '进入该文件夹后点击 + / 上传，选择一个或多个视频。',
+    mobileUploadStep4: '上传完成后回到本页面，点击“我已完成上传”。',
     copiedUploadLink: '上传链接已复制。请到 Safari、Chrome 或 Google Drive App 中打开并上传视频。',
     copyFailed: '复制失败，请长按上传链接复制。',
     manualCopyPrompt: '请复制这个上传链接，然后到 Safari、Chrome 或 Google Drive App 中打开：'
@@ -64,21 +82,30 @@ const translations = {
     pillGlobal: 'Global access',
     pillVideo: 'Multiple videos',
     pillDrive: 'Get upload link',
+    pillDriveMobile: 'Share to Gmail',
     formTitle: 'Information registration',
     formSubtitle: 'After submitting the form, this page will generate a Google Drive upload link.',
+    formSubtitleMobile: 'After submission, the upload folder will be shared with the Gmail entered below.',
     chipLabel: 'Drive link upload',
+    chipLabelMobile: 'Drive app upload',
+    mobileDeviceNote: 'NOTE: PC upload is recommended because it is easier. On mobile, enter the Gmail account currently signed in on the Google Drive app; after submitting, open Google Drive app, go to "Shared with me", find the newest shared folder, and upload there.',
     nameLabel: 'Name',
     orgLabel: 'Organization',
     emailLabel: 'Email',
-    emailHint: 'For mobile upload, preferably enter the Gmail/Google email signed in on the Google Drive app. The upload folder will be shared with this email.',
+    emailHint: 'For PC upload, enter your regular email. For mobile upload, enter the Gmail account signed in on the Google Drive app.',
+    emailHintMobile: 'Mobile upload requires the Gmail account currently signed in on the Google Drive app. The upload folder will be shared with this Gmail.',
     countryLabel: 'Countries',
     othersLabel: 'Other notes',
     progressIdle: 'Waiting for submission',
     submitBtn: 'Submit details and get upload link',
+    submitBtnMobile: 'Submit details and share folder',
     infoTitle: 'Submission steps',
     step1: 'Fill in the required information and submit.',
     step2: 'Open the generated Google Drive upload link.',
     step3: 'Return to this page and confirm after uploading videos.',
+    step1Mobile: 'Fill in the required information. Email must be the Gmail account signed in on the mobile Google Drive app.',
+    step2Mobile: 'After submission, open the Google Drive app and find the newest shared folder in "Shared with me".',
+    step3Mobile: 'Upload videos in that folder, then return to this page and confirm completion.',
     resultTitle: 'Message',
     namePlaceholder: 'Your name',
     orgPlaceholder: 'School, university, institute, or organization',
@@ -90,15 +117,20 @@ const translations = {
     missingOrg: 'organization',
     missingEmail: 'email',
     invalidEmail: 'a valid email address',
+    invalidGmail: 'on mobile, enter a valid Gmail address, such as yourname@gmail.com',
     missingCountries: 'countries',
     configMissing: 'Apps Script Web App URL is not configured. Please set appsScriptUrl in public/config.js first.',
     submitHint: 'Submitting information...',
     success: 'Information submitted. Upload now.',
+    mobileSuccess: 'Information submitted. The upload folder has been shared with your Gmail. Open the Google Drive app, go to "Shared with me", find the newest shared folder, and upload videos there.',
+    mobileSuccessNoShare: 'Information submitted. Open the Google Drive app and check "Shared with me" for the newest shared folder. If it does not appear yet, refresh later or check that the Gmail is correct.',
     networkError: 'Submission failed or the network is unstable. Please check your connection and try again.',
     serverError: 'The service did not respond in time. Please try again later.',
     timeoutError: 'The submission timed out. Check your network and try again.',
     linkReadyTitle: 'Upload link generated',
     linkReadyHint: 'Open the Google Drive folder and upload one or more videos.',
+    linkReadyTitleMobile: 'Upload in the Google Drive app',
+    linkReadyHintMobile: 'The upload folder has been shared with the Gmail entered above. On mobile, find the newest folder in "Shared with me" in the Google Drive app.',
     submissionIdLabel: 'Submission ID',
     openDriveBtn: 'Open upload link',
     copyUploadLinkBtn: 'Copy link',
@@ -111,8 +143,12 @@ const translations = {
     viewUploadFolder: 'Open upload folder',
     openFirstHint: 'Open the upload link and upload videos before confirming completion.',
     closeHint: 'You may close this page.',
-    mobileUploadHint: 'On mobile, sign in to the Google Drive app with the Gmail/Google email entered above. After submission, check "Shared with me" for the folder, or copy the link and open it in Safari, Chrome, or the Drive app.',
-    inAppBrowserHint: 'If an in-app browser such as WeChat only shows "No content" or no upload button, tap "Copy link", then open it in Safari, Chrome, or the Google Drive app. You can also check "Shared with me" in the Drive app.',
+    mobileUploadHint: 'On mobile, do not use the web Drive link for upload. Open the Google Drive app with the Gmail entered above, then find the newest shared folder in "Shared with me".',
+    inAppBrowserHint: 'In-app browsers such as WeChat are not suitable for Google Drive upload. Open the Google Drive app and upload in the newest shared folder under "Shared with me".',
+    mobileUploadStep1: 'Open the Google Drive app and confirm it is signed in with the Gmail entered above.',
+    mobileUploadStep2: 'Go to "Shared with me" and find the newest shared upload folder.',
+    mobileUploadStep3: 'Open that folder, tap + / Upload, and choose one or more videos.',
+    mobileUploadStep4: 'After upload finishes, return to this page and tap "I have finished uploading".',
     copiedUploadLink: 'Upload link copied. Open it in Safari, Chrome, or the Google Drive app, then upload videos.',
     copyFailed: 'Copy failed. Long-press the upload link to copy it.',
     manualCopyPrompt: 'Copy this upload link, then open it in Safari, Chrome, or the Google Drive app:'
@@ -126,6 +162,7 @@ const SUBMISSION_STORAGE_KEY = 'videoUploadPortal.latestSubmission';
 
 const state = {
   lang: localStorage.getItem('lang') || 'zh',
+  isMobile: false,
   pendingRequestId: null,
   pendingTimer: null,
   latestSubmission: null
@@ -155,11 +192,31 @@ const els = {
 };
 
 function t(key, params = {}) {
-  const text = translations[state.lang][key] || translations.en[key] || '';
+  const activeKey = state.isMobile && translations[state.lang][`${key}Mobile`] ? `${key}Mobile` : key;
+  const text = translations[state.lang][activeKey] || translations.en[activeKey] || translations[state.lang][key] || translations.en[key] || '';
   return text.replace(/\{(\w+)\}/g, (_, token) => params[token] ?? '');
 }
 
+function detectMobileDevice() {
+  const ua = navigator.userAgent || '';
+  const uaLooksMobile = /Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(ua);
+  const iPadLike = /Macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+  const coarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  const narrowScreen = window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+  return uaLooksMobile || iPadLike || (coarsePointer && narrowScreen);
+}
+
+function syncDeviceMode() {
+  const next = detectMobileDevice();
+  const changed = state.isMobile !== next;
+  state.isMobile = next;
+  document.body.classList.toggle('is-mobile-flow', state.isMobile);
+  document.body.classList.toggle('is-pc-flow', !state.isMobile);
+  return changed;
+}
+
 function renderLanguage() {
+  syncDeviceMode();
   document.documentElement.lang = state.lang === 'zh' ? 'zh-CN' : 'en';
   els.langSwitchLabel.textContent = state.lang === 'zh' ? 'EN' : '中文';
 
@@ -197,7 +254,8 @@ function loadStoredSubmission() {
       submissionId: submission.submissionId,
       folderUrl: submission.folderUrl,
       driveOpened: Boolean(submission.driveOpened),
-      uploadConfirmed: Boolean(submission.uploadConfirmed)
+      uploadConfirmed: Boolean(submission.uploadConfirmed),
+      sharingNote: submission.sharingNote || ''
     };
   } catch (error) {
     return null;
@@ -322,6 +380,8 @@ function collectMissingFields() {
     missing.push(t('missingEmail'));
   } else if (!form.elements.email.validity.valid) {
     missing.push(t('invalidEmail'));
+  } else if (state.isMobile && !/^[^@\s]+@gmail\.com$/i.test(email)) {
+    missing.push(t('invalidGmail'));
   }
   if (!countries) missing.push(t('missingCountries'));
 
@@ -410,7 +470,8 @@ function showSubmission(response, shouldShowMessage = true) {
     submissionId: response.submissionId,
     folderUrl: response.folderUrl,
     driveOpened: isSameSubmission ? Boolean(previous.driveOpened) : false,
-    uploadConfirmed: isSameSubmission ? Boolean(previous.uploadConfirmed) : false
+    uploadConfirmed: isSameSubmission ? Boolean(previous.uploadConfirmed) : false,
+    sharingNote: response.sharingNote || previous.sharingNote || ''
   };
 
   state.latestSubmission = submission;
@@ -418,11 +479,20 @@ function showSubmission(response, shouldShowMessage = true) {
   renderSubmissionControls();
 
   if (shouldShowMessage) {
-    showResult(t('success'), '', '', 'success');
+    showResult(getSubmissionSuccessMessage(response), '', '', 'success');
   }
 
   updatePrimaryAction();
   if (window.lucide) window.lucide.createIcons();
+}
+
+function getSubmissionSuccessMessage(response) {
+  if (!state.isMobile) {
+    return t('success');
+  }
+
+  const note = String(response.sharingNote || '');
+  return note.includes('direct_email_share_added') ? t('mobileSuccess') : t('mobileSuccessNoShare');
 }
 
 function renderSubmissionControls() {
@@ -435,7 +505,9 @@ function renderSubmissionControls() {
   els.driveLinkLabel.textContent = submission.uploadConfirmed ? t('continueUploadBtn') : t('openDriveBtn');
   updateMobileUploadNote();
   els.confirmCompleteBtn.hidden = false;
-  els.confirmCompleteBtn.disabled = els.form.classList.contains('is-busy') || !submission.driveOpened || submission.uploadConfirmed;
+  els.driveLink.hidden = state.isMobile;
+  els.copyLinkBtn.hidden = state.isMobile;
+  els.confirmCompleteBtn.disabled = els.form.classList.contains('is-busy') || submission.uploadConfirmed || (!state.isMobile && !submission.driveOpened);
 
   if (window.lucide) window.lucide.createIcons();
 }
@@ -476,7 +548,7 @@ async function handleSubmit(event) {
 async function handleConfirmComplete() {
   if (!state.latestSubmission?.submissionId) return;
 
-  if (!state.latestSubmission.driveOpened) {
+  if (!state.isMobile && !state.latestSubmission.driveOpened) {
     showResult(t('openFirstHint'));
     return;
   }
@@ -539,6 +611,12 @@ els.form.addEventListener('submit', handleSubmit);
 els.confirmCompleteBtn.addEventListener('click', handleConfirmComplete);
 els.driveLink.addEventListener('click', handleDriveLinkClick);
 els.copyLinkBtn.addEventListener('click', handleCopyLink);
+window.addEventListener('resize', () => {
+  if (syncDeviceMode()) {
+    renderLanguage();
+    renderSubmissionControls();
+  }
+});
 
 state.latestSubmission = loadStoredSubmission();
 renderLanguage();

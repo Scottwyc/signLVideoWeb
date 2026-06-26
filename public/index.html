@@ -52,6 +52,11 @@
             </div>
           </div>
 
+          <div class="device-note mobile-only">
+            <i data-lucide="info"></i>
+            <p data-i18n="mobileDeviceNote">NOTE: 建议使用 PC 端，操作更方便。手机端请填写 Google Drive App 当前登录的 Gmail 邮箱；提交后到 Google Drive App 的“与我共享”中找到最新共享文件夹并上传。</p>
+          </div>
+
           <div class="form-grid">
             <label>
               <span class="required-label" data-i18n="nameLabel">姓名</span>
@@ -147,6 +152,12 @@
               <i data-lucide="smartphone"></i>
               <p id="mobileUploadNote" data-i18n="mobileUploadHint">手机端请使用 Google Drive App 打开链接，登录后点击 + / 上传。如果看不到上传按钮，请复制链接后在浏览器或 Drive App 中打开。</p>
             </div>
+            <ol class="mobile-upload-steps mobile-only">
+              <li data-i18n="mobileUploadStep1">打开 Google Drive App，并确认登录的是刚才填写的 Gmail。</li>
+              <li data-i18n="mobileUploadStep2">进入“与我共享”，找到最新共享的上传文件夹。</li>
+              <li data-i18n="mobileUploadStep3">进入该文件夹后点击 + / 上传，选择一个或多个视频。</li>
+              <li data-i18n="mobileUploadStep4">上传完成后回到本页面，点击“我已完成上传”。</li>
+            </ol>
             <div class="link-actions">
               <a class="primary-link" id="driveLink" href="#" target="_blank" rel="noreferrer">
                 <i data-lucide="external-link"></i>
