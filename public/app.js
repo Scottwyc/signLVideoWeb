@@ -498,6 +498,7 @@ function getSubmissionSuccessMessage(response) {
 function renderSubmissionControls() {
   const submission = state.latestSubmission;
   if (!submission) return;
+  const showPcUploadActions = !state.isMobile;
 
   els.linkPreview.hidden = false;
   els.submissionId.textContent = submission.submissionId || '-';
@@ -505,8 +506,12 @@ function renderSubmissionControls() {
   els.driveLinkLabel.textContent = submission.uploadConfirmed ? t('continueUploadBtn') : t('openDriveBtn');
   updateMobileUploadNote();
   els.confirmCompleteBtn.hidden = false;
-  els.driveLink.hidden = state.isMobile;
-  els.copyLinkBtn.hidden = state.isMobile;
+  els.driveLink.hidden = !showPcUploadActions;
+  els.copyLinkBtn.hidden = !showPcUploadActions;
+  els.driveLink.style.display = showPcUploadActions ? '' : 'none';
+  els.copyLinkBtn.style.display = showPcUploadActions ? '' : 'none';
+  els.driveLink.setAttribute('aria-hidden', String(!showPcUploadActions));
+  els.copyLinkBtn.setAttribute('aria-hidden', String(!showPcUploadActions));
   els.confirmCompleteBtn.disabled = els.form.classList.contains('is-busy') || submission.uploadConfirmed || (!state.isMobile && !submission.driveOpened);
 
   if (window.lucide) window.lucide.createIcons();

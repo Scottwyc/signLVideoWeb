@@ -481,9 +481,10 @@ body.is-mobile-flow .mobile-upload-note {
   margin-top: 14px;
 }
 
+body.is-mobile-flow .pc-upload-action,
 body.is-mobile-flow #driveLink,
 body.is-mobile-flow #copyLinkBtn {
-  display: none;
+  display: none !important;
 }
 
 .secondary-btn,
@@ -764,5 +765,19 @@ body.is-mobile-flow #copyLinkBtn {
   .ghost-btn,
   .primary-link {
     flex: 1 1 150px;
+  }
+
+  .pc-upload-action,
+  #driveLink,
+  #copyLinkBtn {
+    display: none !important;
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .pc-upload-action,
+  #driveLink,
+  #copyLinkBtn {
+    display: none !important;
   }
 }
