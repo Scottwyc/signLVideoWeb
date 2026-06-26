@@ -301,6 +301,12 @@ label > span {
   font-weight: 600;
 }
 
+.field-hint {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
 .required-label::before {
   content: "*";
   color: var(--danger);

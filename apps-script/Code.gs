@@ -94,6 +94,7 @@ function createSubmission_(request) {
     const submissionId = buildSubmissionId_(now);
     const folder = createUploadFolder_(submissionId, request);
     const folderUrl = folder.getUrl();
+    const sharingNote = shareUploadFolderWithEmail_(folder, request.email, folderUrl, submissionId);
 
     setDescriptionIfAvailable_(folder, buildDescription_({
       submissionId,
@@ -121,7 +122,7 @@ function createSubmission_(request) {
       0,
       '',
       '',
-      '',
+      sharingNote,
       request.userAgent || ''
     ]);
 
@@ -130,7 +131,8 @@ function createSubmission_(request) {
       requestId: request.requestId || '',
       submissionId,
       folderId: folder.getId(),
-      folderUrl
+      folderUrl,
+      sharingNote
     };
   } finally {
     lock.releaseLock();
@@ -258,6 +260,42 @@ function createUploadFolder_(submissionId, request) {
   const folder = root.createFolder(folderName);
   folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
   return folder;
+}
+
+function shareUploadFolderWithEmail_(folder, email, folderUrl, submissionId) {
+  const targetEmail = String(email || '').trim();
+  const notes = [];
+
+  if (!targetEmail) {
+    return 'direct_email_share_skipped: missing email';
+  }
+
+  try {
+    folder.addEditor(targetEmail);
+    notes.push(`direct_email_share_added: ${targetEmail}`);
+  } catch (error) {
+    notes.push(`direct_email_share_failed: ${targetEmail}: ${error.message || error}`);
+  }
+
+  try {
+    MailApp.sendEmail(
+      targetEmail,
+      `Video upload folder: ${submissionId}`,
+      [
+        'Your video upload folder has been created.',
+        '',
+        `Submission ID: ${submissionId}`,
+        `Upload folder: ${folderUrl}`,
+        '',
+        'For mobile upload, open this link with Safari, Chrome, or the Google Drive app. If the folder is visible in "Shared with me", open it there and tap + / Upload.'
+      ].join('\n')
+    );
+    notes.push(`email_notification_sent: ${targetEmail}`);
+  } catch (error) {
+    notes.push(`email_notification_failed: ${targetEmail}: ${error.message || error}`);
+  }
+
+  return notes.join('\n');
 }
 
 function annotateDriveItems_(record) {
