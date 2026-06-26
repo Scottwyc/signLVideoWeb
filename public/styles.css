@@ -400,6 +400,12 @@ textarea:focus {
   color: #1e3a8a;
 }
 
+.mobile-upload-note.is-warning {
+  border-color: rgba(183, 121, 31, 0.26);
+  background: rgba(255, 251, 235, 0.86);
+  color: #92400e;
+}
+
 .mobile-upload-note svg {
   flex: 0 0 auto;
   margin-top: 2px;

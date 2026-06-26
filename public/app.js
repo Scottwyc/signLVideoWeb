@@ -51,9 +51,11 @@ const translations = {
     viewUploadFolder: '打开上传文件夹',
     openFirstHint: '请先打开上传链接并完成视频上传，然后再确认完成。',
     closeHint: '可以关闭此页面。',
-    mobileUploadHint: '手机端请使用 Google Drive App 打开链接，登录后点击 + / 上传。如果看不到上传按钮，请复制链接后在浏览器或 Drive App 中打开。',
-    copiedUploadLink: '上传链接已复制。请在手机浏览器或 Google Drive App 中打开并上传视频。',
-    copyFailed: '复制失败，请长按上传链接复制。'
+    mobileUploadHint: '手机端请使用 Google Drive App 打开链接，登录后点击 + / 上传。如果看不到上传按钮，请复制链接后在 Safari、Chrome 或 Drive App 中打开。',
+    inAppBrowserHint: '如果在微信等内置浏览器中只看到“没有内容”或没有上传按钮，请点击“复制链接”，再到 Safari、Chrome 或 Google Drive App 中打开并上传视频。',
+    copiedUploadLink: '上传链接已复制。请到 Safari、Chrome 或 Google Drive App 中打开并上传视频。',
+    copyFailed: '复制失败，请长按上传链接复制。',
+    manualCopyPrompt: '请复制这个上传链接，然后到 Safari、Chrome 或 Google Drive App 中打开：'
   },
   en: {
     brandTitle: 'Video Upload Portal',
@@ -107,9 +109,11 @@ const translations = {
     viewUploadFolder: 'Open upload folder',
     openFirstHint: 'Open the upload link and upload videos before confirming completion.',
     closeHint: 'You may close this page.',
-    mobileUploadHint: 'On mobile, open the link with the Google Drive app, sign in, then tap + / Upload. If no upload button appears, copy the link and open it in a browser or the Drive app.',
-    copiedUploadLink: 'Upload link copied. Open it in your mobile browser or Google Drive app, then upload videos.',
-    copyFailed: 'Copy failed. Long-press the upload link to copy it.'
+    mobileUploadHint: 'On mobile, open the link with the Google Drive app, sign in, then tap + / Upload. If no upload button appears, copy the link and open it in Safari, Chrome, or the Drive app.',
+    inAppBrowserHint: 'If an in-app browser such as WeChat only shows "No content" or no upload button, tap "Copy link", then open it in Safari, Chrome, or the Google Drive app to upload videos.',
+    copiedUploadLink: 'Upload link copied. Open it in Safari, Chrome, or the Google Drive app, then upload videos.',
+    copyFailed: 'Copy failed. Long-press the upload link to copy it.',
+    manualCopyPrompt: 'Copy this upload link, then open it in Safari, Chrome, or the Google Drive app:'
   }
 };
 
@@ -141,6 +145,7 @@ const els = {
   resultLink: document.getElementById('resultLink'),
   linkPreview: document.getElementById('linkPreview'),
   submissionId: document.getElementById('submissionId'),
+  mobileUploadNote: document.getElementById('mobileUploadNote'),
   driveLink: document.getElementById('driveLink'),
   driveLinkLabel: document.getElementById('driveLinkLabel'),
   copyLinkBtn: document.getElementById('copyLinkBtn'),
@@ -255,6 +260,49 @@ function clearPendingRequest() {
 
 function getAppsScriptUrl() {
   return (CONFIG.appsScriptUrl || '').trim();
+}
+
+function isLikelyInAppBrowser() {
+  return /MicroMessenger|WeChat|FBAN|FBAV|Instagram|Line\/|QQ\//i.test(navigator.userAgent);
+}
+
+function updateMobileUploadNote() {
+  if (!els.mobileUploadNote) return;
+
+  const useInAppHint = isLikelyInAppBrowser();
+  els.mobileUploadNote.textContent = t(useInAppHint ? 'inAppBrowserHint' : 'mobileUploadHint');
+  els.mobileUploadNote.closest('.mobile-upload-note')?.classList.toggle('is-warning', useInAppHint);
+}
+
+function markUploadLinkOpened() {
+  if (!state.latestSubmission) return;
+
+  state.latestSubmission.driveOpened = true;
+  state.latestSubmission.uploadConfirmed = false;
+  saveSubmission();
+  renderSubmissionControls();
+}
+
+async function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    await navigator.clipboard.writeText(text);
+    return true;
+  }
+
+  const input = document.createElement('textarea');
+  input.value = text;
+  input.setAttribute('readonly', '');
+  input.style.position = 'fixed';
+  input.style.top = '-1000px';
+  document.body.appendChild(input);
+  input.select();
+  input.setSelectionRange(0, input.value.length);
+
+  try {
+    return document.execCommand('copy');
+  } finally {
+    input.remove();
+  }
 }
 
 function collectMissingFields() {
@@ -383,6 +431,7 @@ function renderSubmissionControls() {
   els.submissionId.textContent = submission.submissionId || '-';
   els.driveLink.href = submission.folderUrl || '#';
   els.driveLinkLabel.textContent = submission.uploadConfirmed ? t('continueUploadBtn') : t('openDriveBtn');
+  updateMobileUploadNote();
   els.confirmCompleteBtn.hidden = false;
   els.confirmCompleteBtn.disabled = els.form.classList.contains('is-busy') || !submission.driveOpened || submission.uploadConfirmed;
 
@@ -454,24 +503,22 @@ async function handleConfirmComplete() {
 function handleDriveLinkClick() {
   if (!state.latestSubmission) return;
 
-  state.latestSubmission.driveOpened = true;
-  state.latestSubmission.uploadConfirmed = false;
-  saveSubmission();
-  renderSubmissionControls();
-  showResult(t('openFirstHint'), '', '', 'success');
+  markUploadLinkOpened();
+  showResult(t(isLikelyInAppBrowser() ? 'inAppBrowserHint' : 'openFirstHint'), '', '', 'success');
 }
 
 async function handleCopyLink() {
   if (!state.latestSubmission?.folderUrl) return;
 
   try {
-    await navigator.clipboard.writeText(state.latestSubmission.folderUrl);
-    state.latestSubmission.driveOpened = true;
-    state.latestSubmission.uploadConfirmed = false;
-    saveSubmission();
-    renderSubmissionControls();
+    const copied = await copyText(state.latestSubmission.folderUrl);
+    if (!copied) {
+      throw new Error('copy-failed');
+    }
+    markUploadLinkOpened();
     showResult(t('copiedUploadLink'), '', '', 'success');
   } catch (error) {
+    window.prompt(t('manualCopyPrompt'), state.latestSubmission.folderUrl);
     showResult(t('copyFailed'));
   }
 }
