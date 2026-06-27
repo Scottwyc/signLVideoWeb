@@ -1,7 +1,7 @@
 const translations = {
   zh: {
     brandTitle: '视频上传平台',
-    headline: '上传你的手语视频',
+    headline: '上传你的手语记录',
     pillGlobal: '全球访问',
     pillVideo: '多个视频',
     pillDrive: '获取上传链接',
@@ -72,7 +72,7 @@ const translations = {
   },
   en: {
     brandTitle: 'Video Upload Portal',
-    headline: 'Upload Your Sign Language Video',
+    headline: 'Upload Your Sign Language Recording',
     pillGlobal: 'Global access',
     pillVideo: 'Multiple videos',
     pillDrive: 'Get upload link',

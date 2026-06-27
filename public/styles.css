@@ -194,7 +194,7 @@ a {
 
 .hero h1 {
   margin: 0;
-  font-size: clamp(1.9rem, 3vw, 3.2rem);
+  font-size: clamp(1.65rem, 2.55vw, 2.75rem);
   line-height: 1.04;
   letter-spacing: 0;
 }
@@ -724,7 +724,7 @@ body.is-mobile-flow #driveLink {
   }
 
   .hero h1 {
-    font-size: 1.95rem;
+    font-size: 1.68rem;
   }
 
   .hero-pills {
