@@ -155,6 +155,7 @@ const CONFIG = window.UPLOAD_PORTAL_CONFIG || {};
 const BRIDGE_SOURCE = 'video-upload-portal-apps-script';
 const REQUEST_TIMEOUT_MS = 45000;
 const SUBMISSION_STORAGE_KEY = 'videoUploadPortal.latestSubmission';
+const CONTACT_EMAIL = 'smartlearning@bnu.edu.cn';
 
 const state = {
   lang: localStorage.getItem('lang') || 'zh',
@@ -175,6 +176,7 @@ const els = {
   submitBtn: document.getElementById('submitBtn'),
   submitSpinner: document.getElementById('submitSpinner'),
   submitBtnLabel: document.getElementById('submitBtnLabel'),
+  contactNote: document.getElementById('contactNote'),
   resultBox: document.getElementById('resultBox'),
   resultMessage: document.getElementById('resultMessage'),
   resultLink: document.getElementById('resultLink'),
@@ -223,11 +225,28 @@ function renderLanguage() {
     node.placeholder = t(node.dataset.i18nPlaceholder);
   });
 
+  renderContactNote();
+
   if (state.latestSubmission) {
     renderSubmissionControls();
   }
 
   updatePrimaryAction();
+}
+
+function renderContactNote() {
+  if (!els.contactNote) return;
+
+  els.contactNote.textContent = '';
+  const before = document.createTextNode(
+    state.lang === 'zh'
+      ? '如果有任何问题，请联系 '
+      : 'If you have any question, please email '
+  );
+  const link = document.createElement('a');
+  link.href = `mailto:${CONTACT_EMAIL}`;
+  link.textContent = CONTACT_EMAIL;
+  els.contactNote.append(before, link);
 }
 
 function toggleLanguage() {
