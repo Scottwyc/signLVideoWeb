@@ -25,10 +25,10 @@ const translations = {
     infoTitle: '提交步骤',
     step1: '填写必要信息并提交。',
     step2: '打开系统生成的 Google Drive 上传链接。',
-    step3: '上传视频后返回页面确认完成。',
+    step3: '上传视频后，系统会自动检测文件数量。',
     step1Mobile: '填写必要信息，邮箱必须是手机 Google Drive App 登录的 Gmail。',
     step2Mobile: '提交后打开 Google Drive App，在“与我共享”中找到最新共享文件夹。',
-    step3Mobile: '进入文件夹上传视频后，返回页面确认完成。',
+    step3Mobile: '进入文件夹上传视频后，系统会自动检测文件数量。',
     resultTitle: '提示',
     contactNote: '如果有任何问题，请联系 smartlearning@bnu.edu.cn',
     namePlaceholder: '请输入姓名',
@@ -45,33 +45,29 @@ const translations = {
     missingCountries: '国家 / 地区',
     configMissing: '尚未配置 Apps Script Web App 地址，请先在 public/config.js 中填写 appsScriptUrl。',
     submitHint: '正在提交信息...',
-    success: '信息已提交，请现在上传。',
-    mobileSuccess: '信息已提交，上传文件夹已共享到你的 Gmail。请打开 Google Drive App，在“与我共享”中找到最新共享文件夹并上传。',
-    mobileSuccessNoShare: '信息已提交。请打开 Google Drive App，在“与我共享”中查找最新共享文件夹；如果暂时看不到，请稍后刷新或检查 Gmail 是否正确。',
+    success: '信息已提交，请现在上传。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
+    mobileSuccess: '信息已提交，上传文件夹已共享到你的 Gmail。请打开 Google Drive App，在“与我共享”中找到最新共享文件夹并上传。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
+    mobileSuccessNoShare: '信息已提交。请打开 Google Drive App，在“与我共享”中查找最新共享文件夹；如果暂时看不到，请稍后刷新或检查 Gmail 是否正确。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
     networkError: '提交失败或网络不通畅，请检查网络后重试。',
     serverError: '服务暂时没有响应，请稍后再试。',
     timeoutError: '提交超时，请检查网络后重试。',
     linkReadyTitle: '上传链接已生成',
-    linkReadyHint: '请打开 Google Drive 文件夹上传一个或多个视频。',
+    linkReadyHint: '请打开 Google Drive 文件夹上传一个或多个视频。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
     linkReadyTitleMobile: '请到 Google Drive App 上传',
-    linkReadyHintMobile: '上传文件夹已共享到填写的 Gmail。手机端请在 Google Drive App 的“与我共享”中找到最新文件夹。',
+    linkReadyHintMobile: '上传文件夹已共享到填写的 Gmail。手机端请在 Google Drive App 的“与我共享”中找到最新文件夹。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
     submissionIdLabel: '提交编号',
     openDriveBtn: '打开上传链接',
-    confirmCompleteBtn: '我已完成上传',
     continueUploadBtn: '继续上传',
     exitBtn: '退出',
-    confirming: '正在确认上传状态...',
-    confirmed: '已记录上传完成状态。',
-    confirmFailed: '确认失败，请稍后重试。',
     viewUploadFolder: '打开上传文件夹',
-    openFirstHint: '请先打开上传链接并完成视频上传，然后再确认完成。',
+    openFirstHint: '请在打开的 Google Drive 文件夹中上传视频。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
     closeHint: '可以关闭此页面。',
     mobileUploadHint: '手机端不建议通过网页链接上传。请打开 Google Drive App，用填写的 Gmail 登录后，在“与我共享”中找到最新共享文件夹并上传。',
     inAppBrowserHint: '微信等内置浏览器不适合上传 Google Drive 文件。请打开 Google Drive App，在“与我共享”中找到最新共享文件夹并上传。',
     mobileUploadStep1: '打开 Google Drive App，并确认登录的是刚才填写的 Gmail。',
     mobileUploadStep2: '进入“与我共享”，找到最新共享的上传文件夹。',
     mobileUploadStep3: '进入该文件夹后点击 + / 上传，选择一个或多个视频。',
-    mobileUploadStep4: '上传完成后回到本页面，点击“我已完成上传”。',
+    mobileUploadStep4: '上传后系统会自动检测文件数量，可能有 1-2 分钟延迟。',
     copyFailed: '复制失败，请长按上传链接复制。'
   },
   en: {
@@ -100,10 +96,10 @@ const translations = {
     infoTitle: 'Submission steps',
     step1: 'Fill in the required information and submit.',
     step2: 'Open the generated Google Drive upload link.',
-    step3: 'Return to this page and confirm after uploading videos.',
+    step3: 'After uploading videos, the system will automatically detect the file count.',
     step1Mobile: 'Fill in the required information. Email must be the Gmail account signed in on the mobile Google Drive app.',
     step2Mobile: 'After submission, open the Google Drive app and find the newest shared folder in "Shared with me".',
-    step3Mobile: 'Upload videos in that folder, then return to this page and confirm completion.',
+    step3Mobile: 'Upload videos in that folder. The system will automatically detect the file count.',
     resultTitle: 'Message',
     contactNote: 'If you have any question, please email smartlearning@bnu.edu.cn',
     namePlaceholder: 'Your name',
@@ -120,33 +116,29 @@ const translations = {
     missingCountries: 'countries',
     configMissing: 'Apps Script Web App URL is not configured. Please set appsScriptUrl in public/config.js first.',
     submitHint: 'Submitting information...',
-    success: 'Information submitted. Upload now.',
-    mobileSuccess: 'Information submitted. The upload folder has been shared with your Gmail. Open the Google Drive app, go to "Shared with me", find the newest shared folder, and upload videos there.',
-    mobileSuccessNoShare: 'Information submitted. Open the Google Drive app and check "Shared with me" for the newest shared folder. If it does not appear yet, refresh later or check that the Gmail is correct.',
+    success: 'Information submitted. Upload now. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
+    mobileSuccess: 'Information submitted. The upload folder has been shared with your Gmail. Open the Google Drive app, go to "Shared with me", find the newest shared folder, and upload videos there. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
+    mobileSuccessNoShare: 'Information submitted. Open the Google Drive app and check "Shared with me" for the newest shared folder. If it does not appear yet, refresh later or check that the Gmail is correct. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
     networkError: 'Submission failed or the network is unstable. Please check your connection and try again.',
     serverError: 'The service did not respond in time. Please try again later.',
     timeoutError: 'The submission timed out. Check your network and try again.',
     linkReadyTitle: 'Upload link generated',
-    linkReadyHint: 'Open the Google Drive folder and upload one or more videos.',
+    linkReadyHint: 'Open the Google Drive folder and upload one or more videos. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
     linkReadyTitleMobile: 'Upload in the Google Drive app',
-    linkReadyHintMobile: 'The upload folder has been shared with the Gmail entered above. On mobile, find the newest folder in "Shared with me" in the Google Drive app.',
+    linkReadyHintMobile: 'The upload folder has been shared with the Gmail entered above. On mobile, find the newest folder in "Shared with me" in the Google Drive app. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
     submissionIdLabel: 'Submission ID',
     openDriveBtn: 'Open upload link',
-    confirmCompleteBtn: 'I have finished uploading',
     continueUploadBtn: 'Continue uploading',
     exitBtn: 'Exit',
-    confirming: 'Confirming upload status...',
-    confirmed: 'Upload completion status has been recorded.',
-    confirmFailed: 'Confirmation failed. Please try again later.',
     viewUploadFolder: 'Open upload folder',
-    openFirstHint: 'Open the upload link and upload videos before confirming completion.',
+    openFirstHint: 'Upload videos in the opened Google Drive folder. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
     closeHint: 'You may close this page.',
     mobileUploadHint: 'On mobile, do not use the web Drive link for upload. Open the Google Drive app with the Gmail entered above, then find the newest shared folder in "Shared with me".',
     inAppBrowserHint: 'In-app browsers such as WeChat are not suitable for Google Drive upload. Open the Google Drive app and upload in the newest shared folder under "Shared with me".',
     mobileUploadStep1: 'Open the Google Drive app and confirm it is signed in with the Gmail entered above.',
     mobileUploadStep2: 'Go to "Shared with me" and find the newest shared upload folder.',
     mobileUploadStep3: 'Open that folder, tap + / Upload, and choose one or more videos.',
-    mobileUploadStep4: 'After upload finishes, return to this page and tap "I have finished uploading".',
+    mobileUploadStep4: 'After uploading, the system will automatically detect the file count, with a possible 1-2 minute delay.',
     copyFailed: 'Copy failed. Long-press the upload link to copy it.'
   }
 };
@@ -184,8 +176,7 @@ const els = {
   submissionId: document.getElementById('submissionId'),
   mobileUploadNote: document.getElementById('mobileUploadNote'),
   driveLink: document.getElementById('driveLink'),
-  driveLinkLabel: document.getElementById('driveLinkLabel'),
-  confirmCompleteBtn: document.getElementById('confirmCompleteBtn')
+  driveLinkLabel: document.getElementById('driveLinkLabel')
 };
 
 function t(key, params = {}) {
@@ -268,7 +259,6 @@ function loadStoredSubmission() {
       submissionId: submission.submissionId,
       folderUrl: submission.folderUrl,
       driveOpened: Boolean(submission.driveOpened),
-      uploadConfirmed: Boolean(submission.uploadConfirmed),
       sharingNote: submission.sharingNote || ''
     };
   } catch (error) {
@@ -352,7 +342,6 @@ function markUploadLinkOpened() {
   if (!state.latestSubmission) return;
 
   state.latestSubmission.driveOpened = true;
-  state.latestSubmission.uploadConfirmed = false;
   saveSubmission();
   renderSubmissionControls();
 }
@@ -462,7 +451,6 @@ function showSubmission(response, shouldShowMessage = true) {
     submissionId: response.submissionId,
     folderUrl: response.folderUrl,
     driveOpened: isSameSubmission ? Boolean(previous.driveOpened) : false,
-    uploadConfirmed: isSameSubmission ? Boolean(previous.uploadConfirmed) : false,
     sharingNote: response.sharingNote || previous.sharingNote || ''
   };
 
@@ -497,13 +485,11 @@ function renderSubmissionControls() {
     els.submissionId.textContent = submission.submissionId || '-';
   }
   els.driveLink.href = submission.folderUrl || '#';
-  els.driveLinkLabel.textContent = submission.uploadConfirmed ? t('continueUploadBtn') : t('openDriveBtn');
+  els.driveLinkLabel.textContent = t('openDriveBtn');
   updateMobileUploadNote();
-  els.confirmCompleteBtn.hidden = false;
   els.driveLink.hidden = !showPcUploadActions;
   els.driveLink.style.display = showPcUploadActions ? '' : 'none';
   els.driveLink.setAttribute('aria-hidden', String(!showPcUploadActions));
-  els.confirmCompleteBtn.disabled = els.form.classList.contains('is-busy') || submission.uploadConfirmed || (!state.isMobile && !submission.driveOpened);
 
   if (window.lucide) window.lucide.createIcons();
 }
@@ -541,35 +527,6 @@ async function handleSubmit(event) {
   }
 }
 
-async function handleConfirmComplete() {
-  if (!state.latestSubmission?.submissionId) return;
-
-  if (!state.isMobile && !state.latestSubmission.driveOpened) {
-    showResult(t('openFirstHint'));
-    return;
-  }
-
-  setBusy(true);
-  updatePrimaryAction();
-  setProgress(55, t('confirming'));
-
-  try {
-    await postToAppsScript(buildPayload('confirmUpload'));
-    state.latestSubmission.uploadConfirmed = true;
-    saveSubmission();
-    renderSubmissionControls();
-    updatePrimaryAction();
-    setProgress(100, t('confirmed'));
-    showResult(t('confirmed'), '', '', 'success');
-  } catch (error) {
-    setProgress(0, t('progressIdle'));
-    showResult(error.message || t('confirmFailed'));
-  } finally {
-    setBusy(false);
-    updatePrimaryAction();
-  }
-}
-
 function handleDriveLinkClick() {
   if (!state.latestSubmission) return;
 
@@ -588,7 +545,6 @@ function handleExit() {
 
 els.langSwitch.addEventListener('click', toggleLanguage);
 els.form.addEventListener('submit', handleSubmit);
-els.confirmCompleteBtn.addEventListener('click', handleConfirmComplete);
 els.driveLink.addEventListener('click', handleDriveLinkClick);
 window.addEventListener('resize', () => {
   if (syncDeviceMode()) {

@@ -3,6 +3,8 @@ const ROOT_FOLDER_ID = '1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43';
 const SHEET_NAME = 'Submissions';
 const BRIDGE_SOURCE = 'video-upload-portal-apps-script';
 const RENAME_UPLOADED_FILES = true;
+const UPLOAD_SCAN_WINDOW_DAYS = 7;
+const AUTO_SCAN_STATUSES = ['pending_upload', 'uploaded_detected'];
 
 const HEADERS = [
   'submission_id',
@@ -177,6 +179,79 @@ function confirmUpload_(request) {
   }
 }
 
+function scanRecentUploadFolders() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const sheet = getSheet_();
+    const map = getHeaderMap_(sheet);
+    const lastRow = sheet.getLastRow();
+    if (lastRow < 2) {
+      return {scanned: 0, updated: 0, detected: 0};
+    }
+
+    const now = new Date();
+    const cutoffTime = now.getTime() - UPLOAD_SCAN_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    let scanned = 0;
+    let updated = 0;
+    let detected = 0;
+
+    for (let row = 2; row <= lastRow; row += 1) {
+      const status = String(sheet.getRange(row, map.status).getValue() || '').trim();
+      const submittedAt = sheet.getRange(row, map.submitted_at).getValue();
+
+      if (AUTO_SCAN_STATUSES.indexOf(status) === -1) continue;
+      if (!isRecentSubmission_(submittedAt, cutoffTime)) continue;
+
+      const record = getRecordFromRow_(sheet, map, row);
+      const annotation = annotateDriveItems_(record);
+      const nextStatus = annotation.fileCount > 0 ? 'uploaded_detected' : 'pending_upload';
+
+      sheet.getRange(row, map.status).setValue(nextStatus);
+      sheet.getRange(row, map.file_count).setValue(annotation.fileCount);
+      sheet.getRange(row, map.upload_file_names).setValue(annotation.fileNames.join('\n'));
+      sheet.getRange(row, map.annotated_at).setValue(now);
+
+      scanned += 1;
+      updated += 1;
+      if (annotation.fileCount > 0) detected += 1;
+    }
+
+    return {scanned, updated, detected};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function setupUploadScannerTrigger() {
+  ScriptApp.getProjectTriggers().forEach((trigger) => {
+    if (trigger.getHandlerFunction() === 'scanRecentUploadFolders') {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+
+  ScriptApp
+    .newTrigger('scanRecentUploadFolders')
+    .timeBased()
+    .everyMinutes(1)
+    .create();
+}
+
+function removeUploadScannerTrigger() {
+  ScriptApp.getProjectTriggers().forEach((trigger) => {
+    if (trigger.getHandlerFunction() === 'scanRecentUploadFolders') {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
+}
+
+function isRecentSubmission_(submittedAt, cutoffTime) {
+  const value = submittedAt instanceof Date ? submittedAt : new Date(submittedAt);
+  const time = value.getTime();
+  return !Number.isNaN(time) && time >= cutoffTime;
+}
+
 function validateRequired_(request) {
   const missing = [];
   if (!String(request.name || '').trim()) missing.push('name');
@@ -308,29 +383,43 @@ function annotateDriveItems_(record) {
   setDescriptionIfAvailable_(folder, folderDescription);
 
   const files = folder.getFiles();
+  const fileList = [];
   const fileNames = [];
-  let index = 1;
+  let nextIndex = 1;
 
   while (files.hasNext()) {
-    const file = files.next();
+    fileList.push(files.next());
+  }
+
+  fileList.forEach((file) => {
+    const match = file.getName().match(new RegExp(`^${escapeRegExp_(record.submissionId)}_(\\d+)_`));
+    if (match) {
+      nextIndex = Math.max(nextIndex, Number(match[1]) + 1);
+    }
+  });
+
+  fileList.forEach((file) => {
     const originalName = file.getName();
-    const managedName = buildManagedFileName_(record.submissionId, index, originalName);
 
     setDescriptionIfAvailable_(file, `${folderDescription}\n\nFile original name: ${originalName}`);
     if (RENAME_UPLOADED_FILES && originalName.indexOf(`${record.submissionId}_`) !== 0) {
+      const managedName = buildManagedFileName_(record.submissionId, nextIndex, originalName);
       file.setName(managedName);
       fileNames.push(managedName);
+      nextIndex += 1;
     } else {
       fileNames.push(originalName);
     }
-
-    index += 1;
-  }
+  });
 
   return {
     fileCount: fileNames.length,
     fileNames
   };
+}
+
+function escapeRegExp_(value) {
+  return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function buildManagedFileName_(submissionId, index, originalName) {
