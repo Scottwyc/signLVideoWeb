@@ -159,6 +159,14 @@ a {
   overflow-wrap: anywhere;
 }
 
+.brand-logo {
+  width: auto;
+  height: 44px;
+  max-width: 180px;
+  object-fit: contain;
+  flex: 0 1 auto;
+}
+
 .lang-switch,
 .secondary-btn,
 .ghost-btn,
@@ -616,6 +624,14 @@ body.is-mobile-flow #copyLinkBtn {
   word-break: break-word;
 }
 
+.result-box .contact-note {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .result-box.is-error {
   border-color: rgba(185, 28, 28, 0.28);
   background: rgba(254, 242, 242, 0.82);
@@ -719,6 +735,11 @@ body.is-mobile-flow #copyLinkBtn {
 
   .brand-title {
     font-size: 1rem;
+  }
+
+  .brand-logo {
+    height: 36px;
+    max-width: 128px;
   }
 
   .hero {

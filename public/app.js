@@ -1,7 +1,7 @@
 const translations = {
   zh: {
     brandTitle: '视频上传平台',
-    headline: '上传视频',
+    headline: '上传你的手语视频',
     pillGlobal: '全球访问',
     pillVideo: '多个视频',
     pillDrive: '获取上传链接',
@@ -30,6 +30,7 @@ const translations = {
     step2Mobile: '提交后打开 Google Drive App，在“与我共享”中找到最新共享文件夹。',
     step3Mobile: '进入文件夹上传视频后，返回页面确认完成。',
     resultTitle: '提示',
+    contactNote: '如果有任何问题，请联系 smartlearning@bnu.edu.cn',
     namePlaceholder: '请输入姓名',
     orgPlaceholder: '学校、大学、机构或组织',
     emailPlaceholder: 'yourname@gmail.com',
@@ -78,7 +79,7 @@ const translations = {
   },
   en: {
     brandTitle: 'Video Upload Portal',
-    headline: 'Upload videos',
+    headline: 'Upload Your Sign Language Video',
     pillGlobal: 'Global access',
     pillVideo: 'Multiple videos',
     pillDrive: 'Get upload link',
@@ -107,6 +108,7 @@ const translations = {
     step2Mobile: 'After submission, open the Google Drive app and find the newest shared folder in "Shared with me".',
     step3Mobile: 'Upload videos in that folder, then return to this page and confirm completion.',
     resultTitle: 'Message',
+    contactNote: 'If you have any question, please email smartlearning@bnu.edu.cn',
     namePlaceholder: 'Your name',
     orgPlaceholder: 'School, university, institute, or organization',
     emailPlaceholder: 'yourname@gmail.com',
@@ -501,7 +503,9 @@ function renderSubmissionControls() {
   const showPcUploadActions = !state.isMobile;
 
   els.linkPreview.hidden = false;
-  els.submissionId.textContent = submission.submissionId || '-';
+  if (els.submissionId) {
+    els.submissionId.textContent = submission.submissionId || '-';
+  }
   els.driveLink.href = submission.folderUrl || '#';
   els.driveLinkLabel.textContent = submission.uploadConfirmed ? t('continueUploadBtn') : t('openDriveBtn');
   updateMobileUploadNote();
