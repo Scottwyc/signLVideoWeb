@@ -15,8 +15,8 @@ GitHub Pages 静态前端
 -> Google Drive 为每次提交创建专属上传文件夹
 -> PC 用户通过 Google Drive 文件夹链接上传视频
 -> Mobile 用户使用 Google Drive App，在“与我共享”中找到共享文件夹上传视频
--> 用户回到网页点击“我已完成上传”
--> Apps Script 更新 Sheet 状态并标注 Drive 文件
+-> Apps Script 每 1 分钟自动扫描近期上传文件夹
+-> Apps Script 自动更新 Sheet 状态、文件数量和 Drive 文件标注信息
 ```
 
 这个方案的优点是部署简单、成本低、不需要维护 Node 服务器，也不需要把 Google 私钥放到前端。
@@ -92,7 +92,7 @@ https://drive.google.com/drive/folders/1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43
 当前前端正在使用的 Apps Script Web App URL：
 
 ```text
-https://script.google.com/macros/s/AKfycbyVAcJZKv-wesuIqbSS_YTjBOpj93EpdPWH6rBli61d71wCw0da1Myl5ahgCX6TBo9R/exec
+https://script.google.com/macros/s/AKfycbxgDOx_FhQqFo6ZKUq6wPwBCG-mQVXU0no2eNCq4caMUjABWBAeLYzi8HhoE8aHV7OQ/exec
 ```
 
 这个地址已经写入：
@@ -140,14 +140,12 @@ https://scottwyc.github.io/signLVideoWeb/
 3. 页面显示加载动画。
 4. Apps Script 写入 Google Sheet，并在 Google Drive 中创建专属上传文件夹。
 5. Apps Script 将子文件夹设置为“知道链接的任何人可编辑”，并尝试共享给表单邮箱。
-6. 前端显示 Submission ID 和“打开上传链接”按钮。
-7. “我已完成上传”按钮默认灰色且不可点击。
-8. 用户点击“打开上传链接”后进入 Google Drive 文件夹上传视频。
-9. 点击过上传链接后，“我已完成上传”按钮变为可点击。
-10. 用户上传视频后回到网页，点击“我已完成上传”。
-11. Apps Script 更新 Google Sheet 状态，并扫描/标注 Drive 文件。
-12. “我已完成上传”再次变为灰色不可点击。
-13. 上传链接按钮变为“继续上传”，继续打开同一个 Drive 文件夹。
+6. 前端显示“打开上传链接”按钮。
+7. 用户点击“打开上传链接”后进入 Google Drive 文件夹上传一个或多个视频。
+8. 前端提示系统会自动检测上传状态，可能有 1-2 分钟延迟。
+9. Apps Script 定时触发器每 1 分钟扫描近期提交记录对应的 Drive 文件夹。
+10. 如果检测到文件，Apps Script 自动更新 Google Sheet 状态、文件数量和文件名列表，并标注 Drive 文件。
+11. 用户如需继续上传，可以再次打开同一个 Drive 文件夹，不会新建提交记录。
 ```
 
 ### 2. Mobile 端流程
@@ -164,13 +162,13 @@ https://scottwyc.github.io/signLVideoWeb/
 7. Apps Script 将该子文件夹设置为“知道链接的任何人可编辑”。
 8. Apps Script 额外执行 folder.addEditor(email)，把子文件夹直接共享给用户填写的 Gmail。
 9. Apps Script 尝试向该 Gmail 发送包含上传文件夹链接的邮件。
-10. 前端显示 Submission ID 和 Google Drive App 操作步骤。
+10. 前端显示 Google Drive App 操作步骤。
 11. Mobile 端不显示“打开上传链接”“复制链接”等按钮，避免误导用户去手机网页上传。
 12. 用户打开 Google Drive App，并确认登录的是刚才填写的 Gmail。
 13. 用户进入“与我共享”，找到最新共享的上传文件夹。
 14. 用户进入该文件夹后点击 + / 上传，选择一个或多个视频。
-15. 上传完成后回到网页，点击“我已完成上传”。
-16. Apps Script 更新 Google Sheet 状态，并扫描/标注 Drive 文件。
+15. 前端提示系统会自动检测上传状态，可能有 1-2 分钟延迟。
+16. Apps Script 定时触发器自动扫描该文件夹，并更新 Google Sheet。
 ```
 
 Mobile 端提交成功后，如果 Apps Script 返回的 `sharingNote` 中包含：
@@ -198,7 +196,7 @@ direct_email_share_added
 4. 回到页面确认完成。
 ```
 
-该流程对 PC 端仍然适用，但不再作为 Mobile 端主流程。
+该流程已被当前自动扫描逻辑替代，不再要求用户点击“我已完成上传”。
 
 ## 五、前端交互细节
 
@@ -234,9 +232,9 @@ PC 端：
 
 ```text
 1. 显示“打开上传链接”按钮。
-2. 显示“复制链接”按钮。
-3. “我已完成上传”按钮默认灰色。
-4. 只有点击过“打开上传链接”或“继续上传”后，才能点击“我已完成上传”。
+2. 不显示“复制链接”按钮。
+3. 不显示“我已完成上传”按钮。
+4. 提交成功后提示系统会自动检测上传状态，可能有 1-2 分钟延迟。
 5. Countries 输入框与其他必填输入框保持相同宽度，仍支持搜索匹配国家/地区。
 ```
 
@@ -248,7 +246,8 @@ Mobile 端：
 3. 提交后显示 Google Drive App 操作步骤。
 4. 不显示“打开上传链接”按钮。
 5. 不显示“复制链接”按钮。
-6. “我已完成上传”按钮在提交成功后可用，用户需完成 Drive App 上传后再点击。
+6. 不显示“我已完成上传”按钮。
+7. 提交成功后提示系统会自动检测上传状态，可能有 1-2 分钟延迟。
 ```
 
 Mobile 端隐藏链接按钮使用多层兜底：
@@ -290,43 +289,30 @@ PC 端第一次提交成功后显示：
 Open upload link
 ```
 
-用户点击“我已完成上传”后，该按钮变为：
+如果用户需要继续上传，仍然使用同一个按钮打开原 Drive 子文件夹。按钮不会新建提交记录，也不会生成新的 Drive 文件夹。
+
+中文界面中对应显示为：
 
 ```text
-Continue uploading
+打开上传链接
 ```
-
-两个状态打开的都是同一个 Google Drive 子文件夹，不会新建提交记录。
 
 Mobile 端不显示上传链接按钮。
 
-### 5. “I have finished uploading” 按钮
+### 5. 自动上传状态检测
 
-PC 端默认状态：
+当前前端已经取消“我已完成上传 / I have finished uploading”按钮。用户提交表单并进入 Drive 文件夹上传后，不需要再回到网页确认。
+
+页面会提示：
 
 ```text
-灰色，不可点击
+The system will automatically detect the upload status, with a possible 1-2 minute delay.
 ```
 
-点击过 `Open upload link` 或 `Continue uploading` 后：
+中文界面中对应提示为：
 
 ```text
-变为正常颜色，可点击
-```
-
-点击确认完成并成功更新 Sheet 后：
-
-```text
-再次变为灰色，不可点击
-```
-
-Mobile 端：
-
-```text
-提交成功后可点击。
-用户应先在 Google Drive App 的“与我共享”中找到最新共享文件夹并上传视频。
-上传完成后回到网页点击该按钮。
-点击确认完成并成功更新 Sheet 后，再次变为灰色不可点击。
+系统会自动检测上传状态，可能有 1-2 分钟延迟。
 ```
 
 ### 6. Message 提示
@@ -334,13 +320,13 @@ Mobile 端：
 PC 端成功提示：
 
 ```text
-Information submitted. Upload now.
+Information submitted. Upload now. The system will automatically detect the upload status, with a possible 1-2 minute delay.
 ```
 
 中文为：
 
 ```text
-信息已提交，请现在上传。
+信息已提交，请现在上传。系统会自动检测上传状态，可能有 1-2 分钟延迟。
 ```
 
 Mobile 端共享成功提示：
@@ -355,7 +341,7 @@ Mobile 端未检测到共享成功标记时：
 信息已提交。请打开 Google Drive App，在“与我共享”中查找最新共享文件夹；如果暂时看不到，请稍后刷新或检查 Gmail 是否正确。
 ```
 
-提示区不再额外显示 `Open upload folder` 链接，避免和主上传按钮重复。
+提示区不再额外显示 `Open upload folder` 链接，避免和主上传按钮重复。前端也不再显示提交编号，提交编号只保留在 Google Sheet 和 Drive 文件/文件夹标注中。
 
 错误提示会用红色显示，例如网络异常、配置缺失、必填项缺失等。
 
@@ -374,7 +360,7 @@ others
 folder_id
 folder_url
 status
-completed_at
+firstDetected_at
 file_count
 upload_file_names
 annotated_at
@@ -390,12 +376,20 @@ submitted_at        用户提交信息的时间
 folder_id           本次提交对应的 Drive 子文件夹 ID
 folder_url          用户上传视频的 Drive 文件夹链接
 status              当前状态
-completed_at        用户点击“我已完成上传”的时间
+firstDetected_at    第一次自动检测到该文件夹已有上传文件的时间
 file_count          该文件夹下扫描到的文件数量
 upload_file_names   上传文件名列表
-annotated_at        文件夹/文件标注时间
+annotated_at        最近一次自动扫描和标注时间
 notes               共享到邮箱、邮件通知等辅助执行结果
 ```
+
+时间字段显示格式统一为分钟级：
+
+```text
+yyyy-mm-dd hh:mm
+```
+
+其中 `annotated_at` 适合用来判断 Apps Script 定时扫描是否正在运行；`firstDetected_at` 只在第一次发现视频文件时写入，后续扫描不会覆盖。
 
 `notes` 字段当前会记录 Apps Script 尝试共享和发信的结果，例如：
 
@@ -412,7 +406,7 @@ Mobile 端前端会根据 Apps Script 返回的 `sharingNote` 判断是否显示
 
 ```text
 pending_upload      已提交信息，等待用户上传
-user_confirmed      用户已点击“我已完成上传”
+uploaded_detected   自动扫描已检测到上传文件
 ```
 
 ## 七、Google Drive 文件夹和文件标注逻辑
@@ -457,19 +451,22 @@ Mobile upload guidance
 
 注意：如果邮箱不是有效 Google/Gmail 账号、Workspace 管理员限制共享、或 MailApp 权限未授权，共享或邮件可能失败。失败不会阻止提交记录创建，但会写入 `notes`。
 
-### 2. 用户点击“我已完成上传”时
+### 2. 自动扫描上传文件时
 
 脚本会：
 
 ```text
-1. 根据 submission_id 找到 Sheet 中对应行。
-2. 找到该行对应的 Drive 子文件夹。
-3. 扫描该文件夹中的文件。
-4. 给每个文件写入描述信息。
-5. 统计文件数量并写回 file_count。
-6. 把文件名列表写回 upload_file_names。
-7. 把标注时间写回 annotated_at。
-8. 把状态更新为 user_confirmed。
+1. 每 1 分钟由 Apps Script 时间触发器运行 scanRecentUploadFolders。
+2. 只扫描最近 7 天内提交、且 status 为 pending_upload 或 uploaded_detected 的记录。
+3. 根据 submission_id 找到 Sheet 中对应行。
+4. 找到该行对应的 Drive 子文件夹。
+5. 扫描该文件夹中的文件。
+6. 给文件夹和每个文件写入描述信息。
+7. 统计文件数量并写回 file_count。
+8. 把文件名列表写回 upload_file_names。
+9. 把最近扫描时间写回 annotated_at。
+10. 如果第一次发现 file_count > 0，则写入 firstDetected_at。
+11. 如果检测到文件，则把 status 更新为 uploaded_detected；否则保持 pending_upload。
 ```
 
 默认会自动重命名上传文件，给文件名前缀加上提交编号和序号：
@@ -494,6 +491,41 @@ const ROOT_FOLDER_ID = '1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43';
 const SHEET_NAME = 'Submissions';
 const BRIDGE_SOURCE = 'video-upload-portal-apps-script';
 const RENAME_UPLOADED_FILES = true;
+const UPLOAD_SCAN_WINDOW_DAYS = 7;
+const AUTO_SCAN_STATUSES = ['pending_upload', 'uploaded_detected'];
+const SHEET_DATETIME_FORMAT = 'yyyy-mm-dd hh:mm';
+```
+
+### 自动扫描触发器
+
+当前自动扫描入口函数是：
+
+```javascript
+scanRecentUploadFolders()
+```
+
+该函数不会由 Web App URL 自动定时运行，需要在 Apps Script 中先运行一次：
+
+```javascript
+setupUploadScannerTrigger()
+```
+
+运行并授权后，Apps Script 会创建一个每 1 分钟执行一次的时间触发器。可以在 Apps Script 左侧的 Triggers / 触发器页面查看是否存在 `scanRecentUploadFolders` 的定时触发器。
+
+注意：部署新的 Web App URL 不会自动创建定时触发器。每次新建或更换 Apps Script 项目时，都需要至少手动运行一次 `setupUploadScannerTrigger()`，否则 `scanRecentUploadFolders()` 不会自动每分钟执行。
+
+如果需要手动测试扫描是否正常，可以直接在 Apps Script 编辑器中运行：
+
+```javascript
+scanRecentUploadFolders()
+```
+
+运行后查看 Google Sheet 中的 `annotated_at` 是否更新到分钟级时间。如果对应 Drive 子文件夹已有文件，还应看到 `file_count`、`upload_file_names`、`status` 和 `firstDetected_at` 更新。
+
+如果需要删除自动扫描触发器，可以运行：
+
+```javascript
+removeUploadScannerTrigger()
 ```
 
 ### Gmail 共享和邮件通知
@@ -588,6 +620,9 @@ push 到 main
 10. Mobile 端直接打开 Drive 文件夹链接时，可能只显示“没有内容”且没有稳定上传入口。
 11. 当前 Mobile 端改为通过 Gmail 直接共享文件夹，再让用户在 Google Drive App 的“与我共享”中查找最新文件夹上传。
 12. GitHub Pages 部署已验证可以自动更新前端。
+13. 前端已取消“我已完成上传”按钮，改为提示系统自动检测上传状态。
+14. Apps Script 已加入 `scanRecentUploadFolders` 自动扫描逻辑，配合 `setupUploadScannerTrigger` 创建 1 分钟定时触发器。
+15. Sheet 字段已从 `completed_at` 调整为 `firstDetected_at`，用于记录第一次检测到上传文件的时间。
 ```
 
 ## 十二、当前限制
@@ -597,14 +632,15 @@ push 到 main
 ```text
 1. 网页本身不直接上传视频文件。
 2. 用户需要在 Google Drive 页面中上传视频。
-3. 网页无法强制验证用户是否真的上传了文件。
-4. 文件扫描和标注发生在用户点击“我已完成上传”之后。
+3. 网页无法实时强制验证用户是否真的上传了文件。
+4. 文件扫描和标注依赖 Apps Script 定时触发器，通常存在 1-2 分钟延迟。
 5. Drive 子文件夹采用“知道链接的人可编辑”，适合试点，但不是高安全方案。
-6. 如果用户不点击确认，Sheet 状态可能一直停留在 pending_upload。
+6. 如果 Apps Script 触发器未正确安装或授权失败，Sheet 状态可能一直停留在 pending_upload。
 7. Mobile 端依赖用户填写正确 Gmail，并且该 Gmail 与手机 Google Drive App 登录账号一致。
 8. Mobile 端“与我共享”中出现文件夹可能存在短暂延迟，用户可能需要刷新 Google Drive App。
 9. 如果 Google Workspace 管理员限制外部共享，folder.addEditor 或 anyone-with-link 权限可能无法达到预期。
 10. 邮件通知依赖 Apps Script 的 MailApp 授权和 Google 发送限制。
+11. 自动扫描默认只处理最近 7 天且 status 为 pending_upload 或 uploaded_detected 的记录，以避免长期累积导致扫描变慢。
 ```
 
 如果以后要在网页里直接拖拽/选择本地文件并上传到 Drive，需要改成以下更复杂方案之一：

@@ -5,6 +5,7 @@ const BRIDGE_SOURCE = 'video-upload-portal-apps-script';
 const RENAME_UPLOADED_FILES = true;
 const UPLOAD_SCAN_WINDOW_DAYS = 7;
 const AUTO_SCAN_STATUSES = ['pending_upload', 'uploaded_detected'];
+const SHEET_DATETIME_FORMAT = 'yyyy-mm-dd hh:mm';
 
 const HEADERS = [
   'submission_id',
@@ -17,7 +18,7 @@ const HEADERS = [
   'folder_id',
   'folder_url',
   'status',
-  'completed_at',
+  'firstDetected_at',
   'file_count',
   'upload_file_names',
   'annotated_at',
@@ -162,10 +163,12 @@ function confirmUpload_(request) {
     const now = new Date();
 
     sheet.getRange(row, map.status).setValue('user_confirmed');
-    sheet.getRange(row, map.completed_at).setValue(now);
     sheet.getRange(row, map.file_count).setValue(annotation.fileCount);
     sheet.getRange(row, map.upload_file_names).setValue(annotation.fileNames.join('\n'));
-    sheet.getRange(row, map.annotated_at).setValue(now);
+    if (annotation.fileCount > 0) {
+      setFirstDetectedAtIfNeeded_(sheet, row, map, now);
+    }
+    setDateTimeCell_(sheet, row, map.annotated_at, now);
 
     return {
       ok: true,
@@ -211,7 +214,10 @@ function scanRecentUploadFolders() {
       sheet.getRange(row, map.status).setValue(nextStatus);
       sheet.getRange(row, map.file_count).setValue(annotation.fileCount);
       sheet.getRange(row, map.upload_file_names).setValue(annotation.fileNames.join('\n'));
-      sheet.getRange(row, map.annotated_at).setValue(now);
+      if (annotation.fileCount > 0) {
+        setFirstDetectedAtIfNeeded_(sheet, row, map, now);
+      }
+      setDateTimeCell_(sheet, row, map.annotated_at, now);
 
       scanned += 1;
       updated += 1;
@@ -277,6 +283,7 @@ function getSheet_() {
     sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     sheet.setFrozenRows(1);
   } else {
+    renameHeaderIfPresent_(sheet, currentHeaders, 'completed_at', 'firstDetected_at');
     const existing = currentHeaders.filter(Boolean);
     const missing = HEADERS.filter((header) => existing.indexOf(header) === -1);
     if (missing.length) {
@@ -284,7 +291,42 @@ function getSheet_() {
     }
   }
 
+  applySheetFormats_(sheet);
   return sheet;
+}
+
+function applySheetFormats_(sheet) {
+  const map = getHeaderMap_(sheet);
+  ['submitted_at', 'firstDetected_at', 'annotated_at'].forEach((header) => {
+    if (map[header]) {
+      sheet.getRange(2, map[header], Math.max(sheet.getMaxRows() - 1, 1), 1)
+        .setNumberFormat(SHEET_DATETIME_FORMAT);
+    }
+  });
+}
+
+function setDateTimeCell_(sheet, row, column, value) {
+  sheet.getRange(row, column)
+    .setValue(value)
+    .setNumberFormat(SHEET_DATETIME_FORMAT);
+}
+
+function setFirstDetectedAtIfNeeded_(sheet, row, map, value) {
+  const cell = sheet.getRange(row, map.firstDetected_at);
+  if (!cell.getValue()) {
+    cell
+      .setValue(value)
+      .setNumberFormat(SHEET_DATETIME_FORMAT);
+  }
+}
+
+function renameHeaderIfPresent_(sheet, headers, oldHeader, newHeader) {
+  const oldIndex = headers.indexOf(oldHeader);
+  const newIndex = headers.indexOf(newHeader);
+  if (oldIndex !== -1 && newIndex === -1) {
+    sheet.getRange(1, oldIndex + 1).setValue(newHeader);
+    headers[oldIndex] = newHeader;
+  }
 }
 
 function getHeaderMap_(sheet) {
