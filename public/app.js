@@ -150,7 +150,7 @@ const SUBMISSION_STORAGE_KEY = 'videoUploadPortal.latestSubmission';
 const CONTACT_EMAIL = 'smartlearning@bnu.edu.cn';
 
 const state = {
-  lang: localStorage.getItem('lang') || 'zh',
+  lang: localStorage.getItem('lang') || 'en',
   isMobile: false,
   pendingRequestId: null,
   pendingTimer: null,
@@ -229,15 +229,14 @@ function renderContactNote() {
   if (!els.contactNote) return;
 
   els.contactNote.textContent = '';
-  const before = document.createTextNode(
-    state.lang === 'zh'
-      ? '如果有任何问题，请联系 '
-      : 'If you have any question, please email '
-  );
+  const contactText = t('contactNote');
+  const [beforeText, afterText = ''] = contactText.split(CONTACT_EMAIL);
+  const before = document.createTextNode(beforeText);
   const link = document.createElement('a');
   link.href = `mailto:${CONTACT_EMAIL}`;
   link.textContent = CONTACT_EMAIL;
-  els.contactNote.append(before, link);
+  const after = document.createTextNode(afterText);
+  els.contactNote.append(before, link, after);
 }
 
 function toggleLanguage() {
