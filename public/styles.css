@@ -142,7 +142,7 @@ a {
 
 .brand-logo {
   width: auto;
-  height: 58px;
+  height: 70px;
   max-width: 420px;
   object-fit: contain;
   flex: 0 1 auto;
@@ -715,7 +715,7 @@ body.is-mobile-flow #driveLink {
   }
 
   .brand-logo {
-    height: 46px;
+    height: 60px;
     max-width: 270px;
   }
 
