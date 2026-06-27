@@ -156,13 +156,14 @@ a {
 .brand-title {
   font-size: 1.05rem;
   font-weight: 700;
+  line-height: 1.25;
   overflow-wrap: anywhere;
 }
 
 .brand-logo {
   width: auto;
-  height: 44px;
-  max-width: 180px;
+  height: 1.75rem;
+  max-width: 220px;
   object-fit: contain;
   flex: 0 1 auto;
 }
@@ -280,6 +281,13 @@ a {
   margin: 6px 0 0;
   color: var(--muted);
   line-height: 1.55;
+}
+
+.panel-head .panel-contact-note {
+  margin-top: 4px;
+  color: var(--accent);
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .status-chip {
@@ -486,8 +494,7 @@ body.is-mobile-flow .mobile-upload-note {
 }
 
 body.is-mobile-flow .pc-upload-action,
-body.is-mobile-flow #driveLink,
-body.is-mobile-flow #copyLinkBtn {
+body.is-mobile-flow #driveLink {
   display: none !important;
 }
 
@@ -624,14 +631,6 @@ body.is-mobile-flow #copyLinkBtn {
   word-break: break-word;
 }
 
-.result-box .contact-note {
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
 .result-box.is-error {
   border-color: rgba(185, 28, 28, 0.28);
   background: rgba(254, 242, 242, 0.82);
@@ -738,8 +737,8 @@ body.is-mobile-flow #copyLinkBtn {
   }
 
   .brand-logo {
-    height: 36px;
-    max-width: 128px;
+    height: 1.55rem;
+    max-width: 180px;
   }
 
   .hero {
@@ -785,16 +784,14 @@ body.is-mobile-flow #copyLinkBtn {
   }
 
   .pc-upload-action,
-  #driveLink,
-  #copyLinkBtn {
+  #driveLink {
     display: none !important;
   }
 }
 
 @media (hover: none) and (pointer: coarse) {
   .pc-upload-action,
-  #driveLink,
-  #copyLinkBtn {
+  #driveLink {
     display: none !important;
   }
 }

@@ -46,6 +46,7 @@
             <div>
               <h2 data-i18n="formTitle">信息登记</h2>
               <p data-i18n="formSubtitle">提交信息后，页面将生成对应的 Google Drive 上传链接。</p>
+              <p class="panel-contact-note" data-i18n="contactNote">如果有任何问题，请联系 smartlearning@bnu.edu.cn</p>
             </div>
             <div class="status-chip" id="modeChip">
               <i data-lucide="link"></i>
@@ -160,10 +161,6 @@
                 <i data-lucide="external-link"></i>
                 <span id="driveLinkLabel" data-i18n="openDriveBtn">打开上传链接</span>
               </a>
-              <button class="ghost-btn pc-upload-action" id="copyLinkBtn" type="button">
-                <i data-lucide="copy"></i>
-                <span data-i18n="copyUploadLinkBtn">复制链接</span>
-              </button>
               <button class="secondary-btn" id="confirmCompleteBtn" type="button" disabled>
                 <i data-lucide="check-circle-2"></i>
                 <span data-i18n="confirmCompleteBtn">我已完成上传</span>
@@ -204,7 +201,6 @@
             <h3 data-i18n="resultTitle">提示</h3>
             <p id="resultMessage"></p>
             <a id="resultLink" href="#" target="_blank" rel="noreferrer"></a>
-            <p class="contact-note" data-i18n="contactNote">如果有任何问题，请联系 smartlearning@bnu.edu.cn</p>
           </div>
         </aside>
       </section>

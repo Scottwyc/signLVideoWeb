@@ -57,7 +57,6 @@ const translations = {
     linkReadyHintMobile: '上传文件夹已共享到填写的 Gmail。手机端请在 Google Drive App 的“与我共享”中找到最新文件夹。',
     submissionIdLabel: '提交编号',
     openDriveBtn: '打开上传链接',
-    copyUploadLinkBtn: '复制链接',
     confirmCompleteBtn: '我已完成上传',
     continueUploadBtn: '继续上传',
     exitBtn: '退出',
@@ -73,9 +72,7 @@ const translations = {
     mobileUploadStep2: '进入“与我共享”，找到最新共享的上传文件夹。',
     mobileUploadStep3: '进入该文件夹后点击 + / 上传，选择一个或多个视频。',
     mobileUploadStep4: '上传完成后回到本页面，点击“我已完成上传”。',
-    copiedUploadLink: '上传链接已复制。请到 Safari、Chrome 或 Google Drive App 中打开并上传视频。',
-    copyFailed: '复制失败，请长按上传链接复制。',
-    manualCopyPrompt: '请复制这个上传链接，然后到 Safari、Chrome 或 Google Drive App 中打开：'
+    copyFailed: '复制失败，请长按上传链接复制。'
   },
   en: {
     brandTitle: 'Video Upload Portal',
@@ -135,7 +132,6 @@ const translations = {
     linkReadyHintMobile: 'The upload folder has been shared with the Gmail entered above. On mobile, find the newest folder in "Shared with me" in the Google Drive app.',
     submissionIdLabel: 'Submission ID',
     openDriveBtn: 'Open upload link',
-    copyUploadLinkBtn: 'Copy link',
     confirmCompleteBtn: 'I have finished uploading',
     continueUploadBtn: 'Continue uploading',
     exitBtn: 'Exit',
@@ -151,9 +147,7 @@ const translations = {
     mobileUploadStep2: 'Go to "Shared with me" and find the newest shared upload folder.',
     mobileUploadStep3: 'Open that folder, tap + / Upload, and choose one or more videos.',
     mobileUploadStep4: 'After upload finishes, return to this page and tap "I have finished uploading".',
-    copiedUploadLink: 'Upload link copied. Open it in Safari, Chrome, or the Google Drive app, then upload videos.',
-    copyFailed: 'Copy failed. Long-press the upload link to copy it.',
-    manualCopyPrompt: 'Copy this upload link, then open it in Safari, Chrome, or the Google Drive app:'
+    copyFailed: 'Copy failed. Long-press the upload link to copy it.'
   }
 };
 
@@ -189,7 +183,6 @@ const els = {
   mobileUploadNote: document.getElementById('mobileUploadNote'),
   driveLink: document.getElementById('driveLink'),
   driveLinkLabel: document.getElementById('driveLinkLabel'),
-  copyLinkBtn: document.getElementById('copyLinkBtn'),
   confirmCompleteBtn: document.getElementById('confirmCompleteBtn')
 };
 
@@ -345,28 +338,6 @@ function markUploadLinkOpened() {
   renderSubmissionControls();
 }
 
-async function copyText(text) {
-  if (navigator.clipboard && window.isSecureContext) {
-    await navigator.clipboard.writeText(text);
-    return true;
-  }
-
-  const input = document.createElement('textarea');
-  input.value = text;
-  input.setAttribute('readonly', '');
-  input.style.position = 'fixed';
-  input.style.top = '-1000px';
-  document.body.appendChild(input);
-  input.select();
-  input.setSelectionRange(0, input.value.length);
-
-  try {
-    return document.execCommand('copy');
-  } finally {
-    input.remove();
-  }
-}
-
 function collectMissingFields() {
   const missing = [];
   const form = els.form;
@@ -511,11 +482,8 @@ function renderSubmissionControls() {
   updateMobileUploadNote();
   els.confirmCompleteBtn.hidden = false;
   els.driveLink.hidden = !showPcUploadActions;
-  els.copyLinkBtn.hidden = !showPcUploadActions;
   els.driveLink.style.display = showPcUploadActions ? '' : 'none';
-  els.copyLinkBtn.style.display = showPcUploadActions ? '' : 'none';
   els.driveLink.setAttribute('aria-hidden', String(!showPcUploadActions));
-  els.copyLinkBtn.setAttribute('aria-hidden', String(!showPcUploadActions));
   els.confirmCompleteBtn.disabled = els.form.classList.contains('is-busy') || submission.uploadConfirmed || (!state.isMobile && !submission.driveOpened);
 
   if (window.lucide) window.lucide.createIcons();
@@ -590,22 +558,6 @@ function handleDriveLinkClick() {
   showResult(t(isLikelyInAppBrowser() ? 'inAppBrowserHint' : 'openFirstHint'), '', '', 'success');
 }
 
-async function handleCopyLink() {
-  if (!state.latestSubmission?.folderUrl) return;
-
-  try {
-    const copied = await copyText(state.latestSubmission.folderUrl);
-    if (!copied) {
-      throw new Error('copy-failed');
-    }
-    markUploadLinkOpened();
-    showResult(t('copiedUploadLink'), '', '', 'success');
-  } catch (error) {
-    window.prompt(t('manualCopyPrompt'), state.latestSubmission.folderUrl);
-    showResult(t('copyFailed'));
-  }
-}
-
 function handleExit() {
   clearStoredSubmission();
   window.open('', '_self');
@@ -619,7 +571,6 @@ els.langSwitch.addEventListener('click', toggleLanguage);
 els.form.addEventListener('submit', handleSubmit);
 els.confirmCompleteBtn.addEventListener('click', handleConfirmComplete);
 els.driveLink.addEventListener('click', handleDriveLinkClick);
-els.copyLinkBtn.addEventListener('click', handleCopyLink);
 window.addEventListener('resize', () => {
   if (syncDeviceMode()) {
     renderLanguage();
