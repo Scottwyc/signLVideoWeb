@@ -597,6 +597,7 @@ body.is-mobile-flow #driveLink {
 }
 
 .info-block,
+.copyright-card,
 .result-box {
   padding: 16px;
   border: 1px solid rgba(15, 23, 42, 0.08);
@@ -609,6 +610,17 @@ body.is-mobile-flow #driveLink {
   padding-left: 18px;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.copyright-card h3 {
+  margin: 0;
+  font-size: 1.06rem;
+}
+
+.copyright-card p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .result-box p {
