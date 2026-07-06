@@ -331,6 +331,10 @@ body.is-mobile-flow .field-hint.mobile-only {
   gap: 14px;
 }
 
+.form-grid-wide {
+  grid-column: 1 / -1;
+}
+
 label {
   display: grid;
   gap: 8px;

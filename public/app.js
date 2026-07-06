@@ -11,14 +11,15 @@ const translations = {
     formSubtitleMobile: '提交信息后，系统会把上传文件夹共享到填写的 Gmail。',
     chipLabel: 'Drive 链接上传',
     chipLabelMobile: 'Drive App 上传',
-    mobileDeviceNote: 'NOTE: 建议使用 PC 端，操作更方便。手机端请填写 Google Drive App 当前登录的 Gmail 邮箱；提交后到 Google Drive App 的“与我共享”中找到最新共享文件夹并上传。',
+    mobileDeviceNote: 'NOTE: 建议使用 PC 端，操作更方便。手机端请在联系方式中填写 Google Drive App 当前登录的 Gmail 邮箱；提交后到 Google Drive App 的“与我共享”中找到最新共享文件夹并上传。',
     nameLabel: '姓名',
-    orgLabel: '机构 / 组织',
-    emailLabel: '邮箱',
-    emailHint: 'PC 端可填写常用邮箱；如果使用手机上传，请填写 Google Drive App 登录的 Gmail 邮箱。',
-    emailHintMobile: '手机上传必须填写 Google Drive App 当前登录的 Gmail 邮箱，系统会把上传文件夹共享给此 Gmail。',
-    countryLabel: '国家 / 地区',
-    othersLabel: '其他说明',
+    orgLabel: '机构（学校、大学、机构等）',
+    contactLabel: '联系方式（邮箱 / 微信）',
+    contactHint: 'PC 端可填写邮箱或微信；如果使用手机上传，请在联系方式中填写 Google Drive App 登录的 Gmail 邮箱。',
+    contactHintMobile: '手机上传必须在联系方式中填写 Google Drive App 当前登录的 Gmail 邮箱，系统会把上传文件夹共享给此 Gmail。',
+    countryLabel: '国家',
+    signLanguageLabel: '使用的手语',
+    personalBioLabel: '个人简介（选填，100词以内）',
     progressIdle: '等待提交',
     submitBtn: '提交信息并获取上传链接',
     submitBtnMobile: '提交信息并共享文件夹',
@@ -26,23 +27,25 @@ const translations = {
     step1: '填写必要信息并提交。',
     step2: '打开系统生成的 Google Drive 上传链接。',
     step3: '上传视频后，系统会自动检测文件数量。',
-    step1Mobile: '填写必要信息，邮箱必须是手机 Google Drive App 登录的 Gmail。',
+    step1Mobile: '填写必要信息，联系方式中必须包含手机 Google Drive App 登录的 Gmail。',
     step2Mobile: '提交后打开 Google Drive App，在“与我共享”中找到最新共享文件夹。',
     step3Mobile: '进入文件夹上传视频后，系统会自动检测文件数量。',
     resultTitle: '提示',
     contactNote: '如果有任何问题，请联系 smartlearning@bnu.edu.cn',
     namePlaceholder: '请输入姓名',
-    orgPlaceholder: '学校、大学、机构或组织',
-    emailPlaceholder: 'yourname@gmail.com',
-    countryPlaceholder: '输入国家或地区，支持搜索',
-    othersPlaceholder: '可填写补充说明、链接或其他信息',
+    orgPlaceholder: '学校、大学、机构等',
+    contactPlaceholder: '邮箱或微信号',
+    countryPlaceholder: '输入国家，支持搜索',
+    signLanguagePlaceholder: '例如：中国手语、美国手语等',
+    personalBioPlaceholder: '请填写 100 词以内的个人简介',
     validationPrefix: '请补全以下项：',
     missingName: '姓名',
     missingOrg: '机构 / 组织',
-    missingEmail: '邮箱',
-    invalidEmail: '有效邮箱地址',
-    invalidGmail: '手机端请填写有效的 Gmail 地址，例如 yourname@gmail.com',
-    missingCountries: '国家 / 地区',
+    missingContact: '联系方式',
+    invalidGmail: '手机端联系方式中必须包含有效的 Gmail 地址，例如 yourname@gmail.com',
+    missingCountry: '国家',
+    missingSignLanguage: '使用的手语',
+    personalBioTooLong: '个人简介需控制在 100 词以内',
     configMissing: '尚未配置 Apps Script Web App 地址，请先在 public/config.js 中填写 appsScriptUrl。',
     submitHint: '正在提交信息...',
     success: '信息已提交，请现在上传。系统会自动检测上传状态，可能有 1-2 分钟延迟。',
@@ -82,14 +85,15 @@ const translations = {
     formSubtitleMobile: 'After submission, the upload folder will be shared with the Gmail entered below.',
     chipLabel: 'Drive link upload',
     chipLabelMobile: 'Drive app upload',
-    mobileDeviceNote: 'NOTE: PC upload is recommended because it is easier. On mobile, enter the Gmail account currently signed in on the Google Drive app; after submitting, open Google Drive app, go to "Shared with me", find the newest shared folder, and upload there.',
+    mobileDeviceNote: 'NOTE: PC upload is recommended because it is easier. On mobile, include the Gmail account currently signed in on the Google Drive app in Contact Information; after submitting, open Google Drive app, go to "Shared with me", find the newest shared folder, and upload there.',
     nameLabel: 'Name',
-    orgLabel: 'Organization',
-    emailLabel: 'Email',
-    emailHint: 'For PC upload, enter your regular email. For mobile upload, enter the Gmail account signed in on the Google Drive app.',
-    emailHintMobile: 'Mobile upload requires the Gmail account currently signed in on the Google Drive app. The upload folder will be shared with this Gmail.',
-    countryLabel: 'Countries',
-    othersLabel: 'Other notes',
+    orgLabel: 'Organization (School, University, Institution...)',
+    contactLabel: 'Contact Information (Email/WeChat)',
+    contactHint: 'For PC upload, enter an email or WeChat ID. For mobile upload, include the Gmail account signed in on the Google Drive app.',
+    contactHintMobile: 'Mobile upload requires the Gmail account currently signed in on the Google Drive app. The upload folder will be shared with this Gmail.',
+    countryLabel: 'Country',
+    signLanguageLabel: 'Sign language used',
+    personalBioLabel: 'Personal Bio (optional, within 100 words)',
     progressIdle: 'Waiting for submission',
     submitBtn: 'Submit details and get upload link',
     submitBtnMobile: 'Submit details and share folder',
@@ -97,23 +101,25 @@ const translations = {
     step1: 'Fill in the required information and submit.',
     step2: 'Open the generated Google Drive upload link.',
     step3: 'After uploading videos, the system will automatically detect the file count.',
-    step1Mobile: 'Fill in the required information. Email must be the Gmail account signed in on the mobile Google Drive app.',
+    step1Mobile: 'Fill in the required information. Contact Information must include the Gmail account signed in on the mobile Google Drive app.',
     step2Mobile: 'After submission, open the Google Drive app and find the newest shared folder in "Shared with me".',
     step3Mobile: 'Upload videos in that folder. The system will automatically detect the file count.',
     resultTitle: 'Message',
     contactNote: 'If you have any question, please email smartlearning@bnu.edu.cn',
     namePlaceholder: 'Your name',
-    orgPlaceholder: 'School, university, institute, or organization',
-    emailPlaceholder: 'yourname@gmail.com',
-    countryPlaceholder: 'Start typing a country or region',
-    othersPlaceholder: 'Additional context, links, or instructions',
+    orgPlaceholder: 'School, university, institution...',
+    contactPlaceholder: 'Email or WeChat ID',
+    countryPlaceholder: 'Start typing a country',
+    signLanguagePlaceholder: 'e.g., Chinese Sign Language, American Sign Language...',
+    personalBioPlaceholder: 'Within 100 words',
     validationPrefix: 'Please complete: ',
     missingName: 'name',
     missingOrg: 'organization',
-    missingEmail: 'email',
-    invalidEmail: 'a valid email address',
-    invalidGmail: 'on mobile, enter a valid Gmail address, such as yourname@gmail.com',
-    missingCountries: 'countries',
+    missingContact: 'contact information',
+    invalidGmail: 'on mobile, Contact Information must include a valid Gmail address, such as yourname@gmail.com',
+    missingCountry: 'country',
+    missingSignLanguage: 'sign language used',
+    personalBioTooLong: 'personal bio within 100 words',
     configMissing: 'Apps Script Web App URL is not configured. Please set appsScriptUrl in public/config.js first.',
     submitHint: 'Submitting information...',
     success: 'Information submitted. Upload now. The system will automatically detect the upload status, with a possible 1-2 minute delay.',
@@ -345,25 +351,37 @@ function markUploadLinkOpened() {
   renderSubmissionControls();
 }
 
+function countWords(value) {
+  const normalized = String(value || '').trim();
+  if (!normalized) return 0;
+  return normalized.split(/\s+/).filter(Boolean).length;
+}
+
+function includesGmail(value) {
+  return /[A-Z0-9._%+-]+@gmail\.com\b/i.test(String(value || ''));
+}
+
 function collectMissingFields() {
   const missing = [];
   const form = els.form;
 
   const name = form.elements.name.value.trim();
   const organization = form.elements.organization.value.trim();
-  const email = form.elements.email.value.trim();
-  const countries = form.elements.countries.value.trim();
+  const contactInfo = form.elements.contactInfo.value.trim();
+  const country = form.elements.country.value.trim();
+  const signLanguageUsed = form.elements.signLanguageUsed.value.trim();
+  const personalBio = form.elements.personalBio.value.trim();
 
   if (!name) missing.push(t('missingName'));
   if (!organization) missing.push(t('missingOrg'));
-  if (!email) {
-    missing.push(t('missingEmail'));
-  } else if (!form.elements.email.validity.valid) {
-    missing.push(t('invalidEmail'));
-  } else if (state.isMobile && !/^[^@\s]+@gmail\.com$/i.test(email)) {
+  if (!contactInfo) {
+    missing.push(t('missingContact'));
+  } else if (state.isMobile && !includesGmail(contactInfo)) {
     missing.push(t('invalidGmail'));
   }
-  if (!countries) missing.push(t('missingCountries'));
+  if (!country) missing.push(t('missingCountry'));
+  if (!signLanguageUsed) missing.push(t('missingSignLanguage'));
+  if (countWords(personalBio) > 100) missing.push(t('personalBioTooLong'));
 
   return missing;
 }
@@ -381,9 +399,11 @@ function buildPayload(action) {
     submissionId: current.submissionId || '',
     name: form.elements.name.value.trim(),
     organization: form.elements.organization.value.trim(),
-    email: form.elements.email.value.trim(),
-    countries: form.elements.countries.value.trim(),
-    others: form.elements.others.value.trim(),
+    contactInfo: form.elements.contactInfo.value.trim(),
+    country: form.elements.country.value.trim(),
+    signLanguageUsed: form.elements.signLanguageUsed.value.trim(),
+    personalBio: form.elements.personalBio.value.trim(),
+    isMobile: state.isMobile ? 'true' : 'false',
     pageLang: state.lang,
     userAgent: navigator.userAgent
   };

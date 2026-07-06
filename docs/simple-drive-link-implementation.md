@@ -92,7 +92,7 @@ https://drive.google.com/drive/folders/1VGHiAHHnHO9MjaDRPdKTFr2LSbFh_I43
 当前前端正在使用的 Apps Script Web App URL：
 
 ```text
-https://script.google.com/macros/s/AKfycbxgDOx_FhQqFo6ZKUq6wPwBCG-mQVXU0no2eNCq4caMUjABWBAeLYzi8HhoE8aHV7OQ/exec
+https://script.google.com/macros/s/AKfycbye8zXvdBa7quky_hRriRkSStHp2pMUVmys1B2Vw5OGMjuexL3nUKsUs56SE5X8R49x/exec
 ```
 
 这个地址已经写入：
@@ -135,11 +135,11 @@ https://scottwyc.github.io/signLVideoWeb/
 ### 1. PC 端流程
 
 ```text
-1. 用户填写姓名、机构/组织、邮箱、国家/地区、其他说明。
+1. 用户填写 Name、Organization、Contact Information、Country、Sign language used，并可选填写 Personal Bio。
 2. 点击“提交信息并获取上传链接”。
 3. 页面显示加载动画。
 4. Apps Script 写入 Google Sheet，并在 Google Drive 中创建专属上传文件夹。
-5. Apps Script 将子文件夹设置为“知道链接的任何人可编辑”，并尝试共享给表单邮箱。
+5. Apps Script 将子文件夹设置为“知道链接的任何人可编辑”，并尝试从 Contact Information 中提取邮箱进行共享。
 6. 前端显示“打开上传链接”按钮。
 7. 用户点击“打开上传链接”后进入 Google Drive 文件夹上传一个或多个视频。
 8. 前端提示系统会自动检测上传状态，可能有 1-2 分钟延迟。
@@ -154,8 +154,8 @@ https://scottwyc.github.io/signLVideoWeb/
 
 ```text
 1. 页面提示：NOTE: 建议使用 PC 端，操作更方便。
-2. 用户填写姓名、机构/组织、邮箱、国家/地区、其他说明。
-3. Mobile 端强制要求邮箱为 Gmail 地址，例如 yourname@gmail.com。
+2. 用户填写 Name、Organization、Contact Information、Country、Sign language used，并可选填写 Personal Bio。
+3. Mobile 端强制要求 Contact Information 中包含 Gmail 地址，例如 yourname@gmail.com。
 4. 该 Gmail 应为手机 Google Drive App 当前登录账号。
 5. 用户点击“提交信息并共享文件夹”。
 6. Apps Script 创建 Drive 子文件夹。
@@ -200,30 +200,37 @@ direct_email_share_added
 
 ## 五、前端交互细节
 
-### 1. 必填项和邮箱校验
+### 1. 必填项和联系方式校验
 
 以下字段必填，页面会用红色 `*` 标识，并在缺失时阻止提交：
 
 ```text
-姓名 / Name
-机构或组织 / Organization
-邮箱 / Email
-国家或地区 / Countries
+Name
+Organization (School, University, Institution...)
+Contact Information (Email/WeChat)
+Country
+Sign language used
 ```
 
-PC 端邮箱项不显示额外提示词，用户可以填写常用邮箱。
-
-Mobile 端邮箱项显示 Gmail 要求，并强制校验：
+以下字段为选填，但限制在 100 words 以内：
 
 ```text
-邮箱必须是 @gmail.com 地址
+Personal Bio
+```
+
+PC 端 `Contact Information` 可填写邮箱或微信号。若其中包含邮箱，Apps Script 会尝试把 Drive 上传文件夹直接共享给该邮箱，并发送通知邮件；如果只填写微信号，PC 端仍可通过页面生成的 Drive 上传链接上传。
+
+Mobile 端 `Contact Information` 必须包含 Gmail 地址，因为手机端推荐流程依赖 Google Drive App 的“与我共享”：
+
+```text
+Contact Information 中必须包含 @gmail.com 地址
 示例：yourname@gmail.com
 ```
 
-如果 Mobile 端用户填写非 Gmail 邮箱，页面会阻止提交并提示：
+如果 Mobile 端用户没有填写 Gmail，页面会阻止提交并提示：
 
 ```text
-手机端请填写有效的 Gmail 地址，例如 yourname@gmail.com
+手机端联系方式中必须包含有效的 Gmail 地址，例如 yourname@gmail.com
 ```
 
 ### 2. PC / Mobile 显示差异
@@ -235,7 +242,8 @@ PC 端：
 2. 不显示“复制链接”按钮。
 3. 不显示“我已完成上传”按钮。
 4. 提交成功后提示系统会自动检测上传状态，可能有 1-2 分钟延迟。
-5. Countries 输入框与其他必填输入框保持相同宽度，仍支持搜索匹配国家/地区。
+5. Country 输入框与其他必填输入框保持相同宽度，仍支持搜索匹配国家。
+6. 页面右侧显示 Copyright Notice 卡片，移动端会在页面后部显示。
 ```
 
 Mobile 端：
@@ -354,9 +362,10 @@ submission_id
 submitted_at
 name
 organization
-email
-countries
-others
+contact_info
+country
+sign_language_used
+personal_bio
 folder_id
 folder_url
 status
@@ -373,6 +382,12 @@ user_agent
 ```text
 submission_id       每次提交的唯一编号
 submitted_at        用户提交信息的时间
+name                用户姓名
+organization        学校、大学、机构或组织
+contact_info        联系方式，可填写 Email 或 WeChat；如果包含邮箱，脚本会尝试共享 Drive 文件夹和发送邮件
+country             国家
+sign_language_used  使用的手语，例如 Chinese Sign Language、American Sign Language
+personal_bio        个人简介，选填，100 words 以内
 folder_id           本次提交对应的 Drive 子文件夹 ID
 folder_url          用户上传视频的 Drive 文件夹链接
 status              当前状态
@@ -402,6 +417,15 @@ email_notification_failed: user@gmail.com: ...
 
 Mobile 端前端会根据 Apps Script 返回的 `sharingNote` 判断是否显示“已共享到你的 Gmail”的成功提示。
 
+为了兼容旧表，Apps Script 在运行 `setupSheet()` 或其他会调用 `getSheet_()` 的函数时，会自动重命名旧字段：
+
+```text
+email       -> contact_info
+countries   -> country
+others      -> personal_bio
+completed_at -> firstDetected_at
+```
+
 当前状态值：
 
 ```text
@@ -425,23 +449,24 @@ VID-20260626-213000-ABCDEF12_张三_北京师范大学
 Submission ID
 Name
 Organization
-Email
-Countries
+Contact Information
+Country
+Sign language used
 Submitted at
 Folder URL
-Other notes
+Personal Bio
 ```
 
 同时脚本会执行以下权限设置：
 
 ```text
 1. folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT)
-2. folder.addEditor(request.email)
+2. 如果 Contact Information 中包含邮箱，folder.addEditor(email)
 ```
 
-第一步用于保留 PC 端通过链接上传的能力。第二步用于把子文件夹直接共享给用户填写的邮箱，尤其方便 Mobile 用户在 Google Drive App 的“与我共享”中找到该文件夹。
+第一步用于保留 PC 端通过链接上传的能力。第二步用于把子文件夹直接共享给 Contact Information 中提取到的邮箱，尤其方便 Mobile 用户在 Google Drive App 的“与我共享”中找到该文件夹。
 
-脚本还会尝试向用户填写的邮箱发送一封通知邮件，邮件中包含：
+如果 Contact Information 中包含邮箱，脚本还会尝试向该邮箱发送一封通知邮件，邮件中包含：
 
 ```text
 Submission ID
@@ -449,7 +474,7 @@ Upload folder URL
 Mobile upload guidance
 ```
 
-注意：如果邮箱不是有效 Google/Gmail 账号、Workspace 管理员限制共享、或 MailApp 权限未授权，共享或邮件可能失败。失败不会阻止提交记录创建，但会写入 `notes`。
+注意：如果 Contact Information 中没有邮箱、邮箱不是有效 Google/Gmail 账号、Workspace 管理员限制共享、或 MailApp 权限未授权，共享或邮件可能失败或跳过。失败不会阻止提交记录创建，但会写入 `notes`。
 
 ### 2. 自动扫描上传文件时
 
@@ -533,15 +558,16 @@ removeUploadScannerTrigger()
 当前 `createSubmission_` 创建文件夹后，会调用：
 
 ```javascript
-const sharingNote = shareUploadFolderWithEmail_(folder, request.email, folderUrl, submissionId);
+const sharingEmail = extractEmail_(normalized.contactInfo);
+const sharingNote = shareUploadFolderWithEmail_(folder, sharingEmail, folderUrl, submissionId);
 ```
 
 `shareUploadFolderWithEmail_` 会：
 
 ```text
-1. 读取表单 email。
-2. 调用 folder.addEditor(email)，把上传子文件夹直接共享给该邮箱。
-3. 调用 MailApp.sendEmail(email, ...)，发送上传文件夹链接。
+1. 从表单 Contact Information 中提取邮箱。
+2. 如果提取到邮箱，调用 folder.addEditor(email)，把上传子文件夹直接共享给该邮箱。
+3. 如果提取到邮箱，调用 MailApp.sendEmail(email, ...)，发送上传文件夹链接。
 4. 把共享和发信结果合并为 sharingNote。
 5. 将 sharingNote 写入 Sheet 的 notes 字段。
 6. 将 sharingNote 返回给前端。

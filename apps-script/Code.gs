@@ -12,9 +12,10 @@ const HEADERS = [
   'submitted_at',
   'name',
   'organization',
-  'email',
-  'countries',
-  'others',
+  'contact_info',
+  'country',
+  'sign_language_used',
+  'personal_bio',
   'folder_id',
   'folder_url',
   'status',
@@ -93,41 +94,44 @@ function createSubmission_(request) {
 
   try {
     const sheet = getSheet_();
+    const map = getHeaderMap_(sheet);
     const now = new Date();
     const submissionId = buildSubmissionId_(now);
-    const folder = createUploadFolder_(submissionId, request);
+    const normalized = normalizeSubmissionRequest_(request);
+    const folder = createUploadFolder_(submissionId, normalized);
     const folderUrl = folder.getUrl();
-    const sharingNote = shareUploadFolderWithEmail_(folder, request.email, folderUrl, submissionId);
+    const sharingEmail = extractEmail_(normalized.contactInfo);
+    const sharingNote = shareUploadFolderWithEmail_(folder, sharingEmail, folderUrl, submissionId);
 
     setDescriptionIfAvailable_(folder, buildDescription_({
       submissionId,
       submittedAt: now,
-      name: request.name,
-      organization: request.organization,
-      email: request.email,
-      countries: request.countries,
-      others: request.others || '',
+      name: normalized.name,
+      organization: normalized.organization,
+      contactInfo: normalized.contactInfo,
+      country: normalized.country,
+      signLanguageUsed: normalized.signLanguageUsed,
+      personalBio: normalized.personalBio,
       folderUrl
     }));
 
-    sheet.appendRow([
+    sheet.appendRow(buildSubmissionRow_(sheet, map, {
       submissionId,
-      now,
-      request.name,
-      request.organization,
-      request.email,
-      request.countries,
-      request.others || '',
-      folder.getId(),
+      submittedAt: now,
+      name: normalized.name,
+      organization: normalized.organization,
+      contactInfo: normalized.contactInfo,
+      country: normalized.country,
+      signLanguageUsed: normalized.signLanguageUsed,
+      personalBio: normalized.personalBio,
+      folderId: folder.getId(),
       folderUrl,
-      'pending_upload',
-      '',
-      0,
-      '',
-      '',
-      sharingNote,
-      request.userAgent || ''
-    ]);
+      status: 'pending_upload',
+      fileCount: 0,
+      uploadFileNames: '',
+      notes: sharingNote,
+      userAgent: request.userAgent || ''
+    }));
 
     return {
       ok: true,
@@ -259,14 +263,31 @@ function isRecentSubmission_(submittedAt, cutoffTime) {
 }
 
 function validateRequired_(request) {
+  const normalized = normalizeSubmissionRequest_(request);
   const missing = [];
-  if (!String(request.name || '').trim()) missing.push('name');
-  if (!String(request.organization || '').trim()) missing.push('organization');
-  if (!String(request.email || '').trim()) missing.push('email');
-  if (!String(request.countries || '').trim()) missing.push('countries');
+  if (!normalized.name) missing.push('name');
+  if (!normalized.organization) missing.push('organization');
+  if (!normalized.contactInfo) missing.push('contact_info');
+  if (!normalized.country) missing.push('country');
+  if (!normalized.signLanguageUsed) missing.push('sign_language_used');
   if (missing.length) {
     throw new Error('Missing required fields: ' + missing.join(', '));
   }
+
+  if (countWords_(normalized.personalBio) > 100) {
+    throw new Error('Personal bio must be within 100 words.');
+  }
+}
+
+function normalizeSubmissionRequest_(request) {
+  return {
+    name: String(request.name || '').trim(),
+    organization: String(request.organization || '').trim(),
+    contactInfo: String(request.contactInfo || request.email || '').trim(),
+    country: String(request.country || request.countries || '').trim(),
+    signLanguageUsed: String(request.signLanguageUsed || request.sign_language_used || '').trim(),
+    personalBio: String(request.personalBio || request.personal_bio || request.others || '').trim()
+  };
 }
 
 function getSheet_() {
@@ -284,6 +305,9 @@ function getSheet_() {
     sheet.setFrozenRows(1);
   } else {
     renameHeaderIfPresent_(sheet, currentHeaders, 'completed_at', 'firstDetected_at');
+    renameHeaderIfPresent_(sheet, currentHeaders, 'email', 'contact_info');
+    renameHeaderIfPresent_(sheet, currentHeaders, 'countries', 'country');
+    renameHeaderIfPresent_(sheet, currentHeaders, 'others', 'personal_bio');
     const existing = currentHeaders.filter(Boolean);
     const missing = HEADERS.filter((header) => existing.indexOf(header) === -1);
     if (missing.length) {
@@ -339,6 +363,34 @@ function getHeaderMap_(sheet) {
   }, {});
 }
 
+function buildSubmissionRow_(sheet, map, values) {
+  const row = new Array(sheet.getLastColumn()).fill('');
+  setRowValue_(row, map, 'submission_id', values.submissionId);
+  setRowValue_(row, map, 'submitted_at', values.submittedAt);
+  setRowValue_(row, map, 'name', values.name);
+  setRowValue_(row, map, 'organization', values.organization);
+  setRowValue_(row, map, 'contact_info', values.contactInfo);
+  setRowValue_(row, map, 'country', values.country);
+  setRowValue_(row, map, 'sign_language_used', values.signLanguageUsed);
+  setRowValue_(row, map, 'personal_bio', values.personalBio);
+  setRowValue_(row, map, 'folder_id', values.folderId);
+  setRowValue_(row, map, 'folder_url', values.folderUrl);
+  setRowValue_(row, map, 'status', values.status);
+  setRowValue_(row, map, 'firstDetected_at', '');
+  setRowValue_(row, map, 'file_count', values.fileCount);
+  setRowValue_(row, map, 'upload_file_names', values.uploadFileNames);
+  setRowValue_(row, map, 'annotated_at', '');
+  setRowValue_(row, map, 'notes', values.notes);
+  setRowValue_(row, map, 'user_agent', values.userAgent);
+  return row;
+}
+
+function setRowValue_(row, map, header, value) {
+  if (map[header]) {
+    row[map[header] - 1] = value;
+  }
+}
+
 function findRowBySubmissionId_(sheet, map, submissionId) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return 0;
@@ -358,9 +410,10 @@ function getRecordFromRow_(sheet, map, row) {
     submittedAt: sheet.getRange(row, map.submitted_at).getValue(),
     name: sheet.getRange(row, map.name).getValue(),
     organization: sheet.getRange(row, map.organization).getValue(),
-    email: sheet.getRange(row, map.email).getValue(),
-    countries: sheet.getRange(row, map.countries).getValue(),
-    others: sheet.getRange(row, map.others).getValue(),
+    contactInfo: sheet.getRange(row, map.contact_info).getValue(),
+    country: sheet.getRange(row, map.country).getValue(),
+    signLanguageUsed: sheet.getRange(row, map.sign_language_used).getValue(),
+    personalBio: sheet.getRange(row, map.personal_bio).getValue(),
     folderId: sheet.getRange(row, map.folder_id).getValue(),
     folderUrl: sheet.getRange(row, map.folder_url).getValue()
   };
@@ -384,7 +437,7 @@ function shareUploadFolderWithEmail_(folder, email, folderUrl, submissionId) {
   const notes = [];
 
   if (!targetEmail) {
-    return 'direct_email_share_skipped: missing email';
+    return 'direct_email_share_skipped: no email found in contact_info';
   }
 
   try {
@@ -473,12 +526,24 @@ function buildDescription_(record) {
     `Submission ID: ${record.submissionId || ''}`,
     `Name: ${record.name || ''}`,
     `Organization: ${record.organization || ''}`,
-    `Email: ${record.email || ''}`,
-    `Countries: ${record.countries || ''}`,
+    `Contact Information: ${record.contactInfo || ''}`,
+    `Country: ${record.country || ''}`,
+    `Sign language used: ${record.signLanguageUsed || ''}`,
     `Submitted at: ${record.submittedAt || ''}`,
     `Folder URL: ${record.folderUrl || ''}`,
-    `Other notes: ${record.others || ''}`
+    `Personal Bio: ${record.personalBio || ''}`
   ].join('\n');
+}
+
+function extractEmail_(value) {
+  const match = String(value || '').match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i);
+  return match ? match[0] : '';
+}
+
+function countWords_(value) {
+  const normalized = String(value || '').trim();
+  if (!normalized) return 0;
+  return normalized.split(/\s+/).filter(Boolean).length;
 }
 
 function setDescriptionIfAvailable_(driveItem, description) {
