@@ -215,11 +215,17 @@ function renderLanguage() {
   els.langSwitchLabel.textContent = state.lang === 'zh' ? 'EN' : '中文';
 
   document.querySelectorAll('[data-i18n]').forEach((node) => {
-    node.textContent = t(node.dataset.i18n);
+    const translated = t(node.dataset.i18n);
+    if (translated) {
+      node.textContent = translated;
+    }
   });
 
   document.querySelectorAll('[data-i18n-placeholder]').forEach((node) => {
-    node.placeholder = t(node.dataset.i18nPlaceholder);
+    const translated = t(node.dataset.i18nPlaceholder);
+    if (translated) {
+      node.placeholder = translated;
+    }
   });
 
   renderContactNote();
