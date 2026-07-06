@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Video Upload Portal | 视频上传平台</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script defer src="config.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="topbar">
+      <div class="brand">
+        <img class="brand-logo" src="assets/logo1.png" alt="Project logo">
+      </div>
+      <button class="lang-switch" id="langSwitch" type="button" aria-label="Switch language">
+        <i data-lucide="languages"></i>
+        <span id="langSwitchLabel">中文</span>
+      </button>
+    </header>
+
+    <main class="layout">
+      <section class="hero" aria-label="Video upload portal">
+        <div class="hero-copy">
+          <h1 data-i18n="headline">Upload Your Sign Language Recording</h1>
+        </div>
+        <div class="hero-pills" aria-label="Highlights">
+          <span><i data-lucide="globe"></i><b data-i18n="pillGlobal">Global access</b></span>
+          <span><i data-lucide="file-video"></i><b data-i18n="pillVideo">Multiple videos</b></span>
+          <span><i data-lucide="cloud-upload"></i><b data-i18n="pillDrive">Get upload link</b></span>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <form class="upload-panel" id="submissionForm">
+          <div class="panel-head">
+            <div>
+              <h2 data-i18n="formTitle">Information registration</h2>
+              <p data-i18n="formSubtitle">After submitting the form, this page will generate a Google Drive upload link.</p>
+              <p class="panel-contact-note" id="contactNote"></p>
+            </div>
+            <div class="status-chip" id="modeChip">
+              <i data-lucide="link"></i>
+              <span data-i18n="chipLabel">Drive link upload</span>
+            </div>
+          </div>
+
+          <div class="device-note mobile-only">
+            <i data-lucide="info"></i>
+            <p data-i18n="mobileDeviceNote">NOTE: 建议使用 PC 端，操作更方便。手机端请填写 Google Drive App 当前登录的 Gmail 邮箱；提交后到 Google Drive App 的“与我共享”中找到最新共享文件夹并上传。</p>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span class="required-label" data-i18n="nameLabel">姓名</span>
+              <input name="name" type="text" required autocomplete="name" data-i18n-placeholder="namePlaceholder" placeholder="请输入姓名">
+            </label>
+            <label>
+              <span class="required-label" data-i18n="orgLabel">机构 / 组织</span>
+              <input name="organization" type="text" required autocomplete="organization" data-i18n-placeholder="orgPlaceholder" placeholder="学校、大学、机构或组织">
+            </label>
+            <label>
+              <span class="required-label" data-i18n="contactLabel">联系方式（邮箱 / 微信）</span>
+              <input name="contactInfo" type="text" required autocomplete="email" data-i18n-placeholder="contactPlaceholder" placeholder="Email or WeChat ID">
+              <small class="field-hint mobile-only" data-i18n="contactHint">手机上传必须在联系方式中填写 Google Drive App 当前登录的 Gmail 邮箱，系统会把上传文件夹共享给此 Gmail。</small>
+            </label>
+            <label>
+              <span class="required-label" data-i18n="countryLabel">国家</span>
+              <input name="country" type="text" list="countryOptions" required autocomplete="country-name" data-i18n-placeholder="countryPlaceholder" placeholder="输入国家，支持搜索">
+            </label>
+            <label class="form-grid-wide">
+              <span class="required-label" data-i18n="signLanguageLabel">使用的手语</span>
+              <input name="signLanguageUsed" type="text" required data-i18n-placeholder="signLanguagePlaceholder" placeholder="例如：中国手语、美国手语等">
+            </label>
+          </div>
+
+          <datalist id="countryOptions">
+            <option value="Argentina"></option>
+            <option value="Australia"></option>
+            <option value="Austria"></option>
+            <option value="Bangladesh"></option>
+            <option value="Belgium"></option>
+            <option value="Brazil"></option>
+            <option value="Canada"></option>
+            <option value="Chile"></option>
+            <option value="China"></option>
+            <option value="Czech Republic"></option>
+            <option value="Denmark"></option>
+            <option value="Egypt"></option>
+            <option value="Finland"></option>
+            <option value="France"></option>
+            <option value="Germany"></option>
+            <option value="Greece"></option>
+            <option value="Hong Kong"></option>
+            <option value="India"></option>
+            <option value="Indonesia"></option>
+            <option value="Ireland"></option>
+            <option value="Italy"></option>
+            <option value="Japan"></option>
+            <option value="Kenya"></option>
+            <option value="Malaysia"></option>
+            <option value="Mexico"></option>
+            <option value="Netherlands"></option>
+            <option value="New Zealand"></option>
+            <option value="Nigeria"></option>
+            <option value="Norway"></option>
+            <option value="Pakistan"></option>
+            <option value="Philippines"></option>
+            <option value="Poland"></option>
+            <option value="Portugal"></option>
+            <option value="Qatar"></option>
+            <option value="Russia"></option>
+            <option value="Saudi Arabia"></option>
+            <option value="Singapore"></option>
+            <option value="South Africa"></option>
+            <option value="South Korea"></option>
+            <option value="Spain"></option>
+            <option value="Sweden"></option>
+            <option value="Switzerland"></option>
+            <option value="Taiwan"></option>
+            <option value="Thailand"></option>
+            <option value="Turkey"></option>
+            <option value="United Arab Emirates"></option>
+            <option value="United Kingdom"></option>
+            <option value="United States"></option>
+            <option value="Vietnam"></option>
+          </datalist>
+
+          <label class="full-width">
+            <span data-i18n="personalBioLabel">个人简介（选填，100词以内）</span>
+            <textarea name="personalBio" rows="4" data-i18n-placeholder="personalBioPlaceholder" placeholder="请填写 100 词以内的个人简介"></textarea>
+          </label>
+
+          <div class="link-preview" id="linkPreview" hidden>
+            <div class="link-preview-head">
+              <div class="upload-icon">
+                <i data-lucide="folder-up"></i>
+              </div>
+              <div>
+                <strong data-i18n="linkReadyTitle">上传链接已生成</strong>
+                <p data-i18n="linkReadyHint">请打开 Google Drive 文件夹上传一个或多个视频。</p>
+              </div>
+            </div>
+            <div class="mobile-upload-note">
+              <i data-lucide="smartphone"></i>
+              <p id="mobileUploadNote" data-i18n="mobileUploadHint">手机端请使用 Google Drive App 打开链接，登录后点击 + / 上传。如果看不到上传按钮，请复制链接后在浏览器或 Drive App 中打开。</p>
+            </div>
+            <ol class="mobile-upload-steps mobile-only">
+              <li data-i18n="mobileUploadStep1">打开 Google Drive App，并确认登录的是刚才填写的 Gmail。</li>
+              <li data-i18n="mobileUploadStep2">进入“与我共享”，找到最新共享的上传文件夹。</li>
+              <li data-i18n="mobileUploadStep3">进入该文件夹后点击 + / 上传，选择一个或多个视频。</li>
+              <li data-i18n="mobileUploadStep4">上传后系统会自动检测文件数量，可能有 1-2 分钟延迟。</li>
+            </ol>
+            <div class="link-actions">
+              <a class="primary-link pc-upload-action" id="driveLink" href="#" target="_blank" rel="noreferrer">
+                <i data-lucide="external-link"></i>
+                <span id="driveLinkLabel" data-i18n="openDriveBtn">打开上传链接</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="progress-area">
+            <div class="progress-meta">
+              <span id="progressLabel" data-i18n="progressIdle">等待提交</span>
+              <span id="progressPercent">0%</span>
+            </div>
+            <div class="progress-track" aria-hidden="true">
+              <div class="progress-bar" id="progressBar"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="primary-btn" type="submit" id="submitBtn">
+              <i data-lucide="send"></i>
+              <span class="spinner" id="submitSpinner" aria-hidden="true"></span>
+              <span id="submitBtnLabel" data-i18n="submitBtn">提交信息并获取上传链接</span>
+            </button>
+          </div>
+        </form>
+
+        <aside class="info-panel">
+          <div class="info-block">
+            <h3 data-i18n="infoTitle">提交步骤</h3>
+            <ol>
+              <li data-i18n="step1">填写必要信息并提交。</li>
+              <li data-i18n="step2">打开系统生成的 Google Drive 上传链接。</li>
+              <li data-i18n="step3">上传视频后返回页面确认完成。</li>
+            </ol>
+          </div>
+
+          <div class="copyright-card" aria-label="Copyright notice">
+            <h3><strong>Copyright Notice</strong></h3>
+            <p>Submission implies authorization for non-commercial use by the organizers, including editing, compilation, multi-platform release, and public welfare promotion. Organizers will not use submissions for commercial profit. Copyright remains with the original authors.</p>
+          </div>
+
+          <div class="result-box" id="resultBox" hidden>
+            <h3 data-i18n="resultTitle">提示</h3>
+            <p id="resultMessage"></p>
+            <a id="resultLink" href="#" target="_blank" rel="noreferrer"></a>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <iframe class="bridge-frame" id="appsScriptFrame" name="appsScriptFrame" title="Submission bridge"></iframe>
+</body>
+</html>
